@@ -1,8 +1,15 @@
 name: Update Nix sources
 
 on:
-  release:
-    types: [published]
+  # A v* tag push is the real release signal. The `release: [published]`
+  # event never fires for releases created by CI: tauri-action publishes
+  # them with the repository GITHUB_TOKEN, and GitHub does not dispatch
+  # workflow events for GITHUB_TOKEN actions (only workflow_dispatch /
+  # repository_dispatch re-fire). release.yml triggers the same way, so the
+  # nix source update runs in lockstep with the build.
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
     inputs:
       tag:
@@ -15,13 +22,16 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    # Skip prerelease releases (e.g. v1.2.3-rc.1 and the build/** releases
-    # published by release.yml) — nix sources must only pin stable releases.
+    # A v* tag push always runs; prerelease tags (v1.2.3-rc.1) are caught by
+    # the Normalize tag step's skip detection below. The release-event clause
+    # stays as a safety net for releases created outside CI (e.g. with a PAT),
+    # where GitHub does fire release: [published] — skip those when prerelease.
     if: github.event_name == 'workflow_dispatch' || !github.event.release.prerelease
 
     steps:
-      # On a `release` event the default checkout lands on the tag (detached
-      # HEAD); create-pull-request needs a branch base, so check out main.
+      # A tag push or release event leaves the default checkout on the tag
+      # (detached HEAD); create-pull-request needs a branch base, so always
+      # check out main.
       - uses: actions/checkout@v4
         with:
           ref: main
@@ -29,7 +39,7 @@ jobs:
       - name: Normalize tag
         id: tag
         env:
-          RAW_TAG: ${{ github.event.release.tag_name || github.event.inputs.tag }}
+          RAW_TAG: ${{ github.event.release.tag_name || github.event.inputs.tag || github.ref_name }}
         run: |
           case "$RAW_TAG" in
             v*) TAG="$RAW_TAG" ;;
