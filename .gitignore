@@ -20,6 +20,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# Personal Claude Code configuration (gateway keys, skills — not part of the project)
+.claude/
+
 # Rust / Tauri
 src-tauri/target
 src-tauri/gen/schemas
