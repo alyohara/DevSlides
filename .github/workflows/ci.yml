@@ -16,6 +16,8 @@ jobs:
 
       - name: Lint
         run: bun run lint
+      - name: Version sync check
+        run: bun run check:versions
       - name: Format check
         run: bun run format:check
       - name: svelte-check

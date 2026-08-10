@@ -58,8 +58,22 @@ jobs:
           INPUT_PRERELEASE: ${{ github.event.inputs.prerelease }}
           VERSION: ${{ steps.notes.outputs.version }}
         run: |
+          # Centralized prerelease decision, per semver. A v-tag is a
+          # prerelease only when it carries a prerelease suffix (v1.2.3-rc.1);
+          # clean vX.Y.Z tags, with or without +build metadata, are stable.
+          # Anything unclassifiable fails loudly rather than guess — a
+          # misclassified tag would silently skip the marketing-site update or
+          # publish a stable release as a prerelease.
           if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
-            echo "isPrerelease=false" >> "$GITHUB_OUTPUT"
+            if [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-[0-9A-Za-z] ]]; then
+              is_prerelease=true
+            elif [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(\+[0-9A-Za-z.-]+)?$ ]]; then
+              is_prerelease=false
+            else
+              echo "::error::Cannot classify release tag ${GITHUB_REF_NAME} (expected vX.Y.Z or vX.Y.Z-<prerelease>)" >&2
+              exit 1
+            fi
+            echo "isPrerelease=${is_prerelease}" >> "$GITHUB_OUTPUT"
             echo "releaseTag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
             echo "releaseName=OpenSlides ${VERSION}" >> "$GITHUB_OUTPUT"
           else
@@ -185,7 +199,17 @@ jobs:
           done
           rm -f squashfs-root/usr/lib/libwayland-server.so.0 || true
 
-          curl -fsSL -o appimagetool.AppImage \
+          # The ~93MB appimagetool download and the final upload are the two
+          # network-critical steps in this leg. tauri-action already published
+          # the release before this step runs, so a transient network blip here
+          # would fail the whole linux run for no good reason — give each a
+          # retry window. Retry only transient failures (timeouts, connection
+          # refused, 5xx), not permanent 404s; cap each attempt so a stalled
+          # transfer can't hang the step; and resume on retry instead of
+          # restarting the download from byte 0.
+          curl -fL --retry 5 --retry-connrefused --retry-delay 5 \
+            --connect-timeout 30 --max-time 600 -C - \
+            -o appimagetool.AppImage \
             https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage
           chmod +x appimagetool.AppImage
           ARCH=x86_64 ./appimagetool.AppImage --appimage-extract-and-run squashfs-root "$BASENAME"
@@ -198,14 +222,41 @@ jobs:
             || { echo "openslides binary missing from repacked AppImage"; ls -la squashfs-root/usr/bin/ || true; exit 1; }
           popd >/dev/null
 
+          # Keep the unpatched copy so a failed --clobber replace can be rolled
+          # back: gh deletes the existing asset BEFORE uploading the
+          # replacement, so a failed attempt would otherwise leave the published
+          # release with no AppImage at all.
+          cp "$APPIMAGE" "$WORK/original.AppImage"
           cp "$WORK/$BASENAME" "$APPIMAGE"
 
-          gh release upload "$RELEASE_TAG" "$APPIMAGE" \
-            --clobber --repo "$GITHUB_REPOSITORY"
+          uploaded=0
+          for attempt in 1 2 3 4 5; do
+            if gh release upload "$RELEASE_TAG" "$APPIMAGE" \
+                --clobber --repo "$GITHUB_REPOSITORY"; then
+              echo "Uploaded patched $BASENAME (attempt $attempt)"
+              uploaded=1
+              break
+            fi
+            echo "gh release upload attempt $attempt failed; retrying in 10s"
+            sleep 10
+          done
+          if (( uploaded != 1 )); then
+            echo "Failed to upload patched $BASENAME after 5 attempts" >&2
+            echo "Restoring original $BASENAME to the release" >&2
+            gh release upload "$RELEASE_TAG" "$WORK/original.AppImage#$BASENAME" \
+              --clobber --repo "$GITHUB_REPOSITORY" \
+              || echo "::warning::Could not restore original $BASENAME to the release" >&2
+            exit 1
+          fi
 
   update-marketing-site:
     needs: [extract-notes, build-tauri]
-    if: startsWith(github.ref, 'refs/tags/v')
+    # Stable tags only — a prerelease tag (e.g. v1.2.3-rc.1) must not push
+    # release notes to the marketing site. String comparison (not fromJSON):
+    # fromJSON('') throws and GitHub silently treats a throwing `if` as false,
+    # which would skip the update with no signal. Every v-tag path above always
+    # sets isPrerelease, so this can only skip on a genuine prerelease.
+    if: startsWith(github.ref, 'refs/tags/v') && needs.extract-notes.outputs.isPrerelease == 'false'
     runs-on: ubuntu-latest
     steps:
       - name: Send release notes to the marketing site

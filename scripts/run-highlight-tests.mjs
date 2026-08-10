@@ -5,16 +5,15 @@
  * No additional dev-dependencies required.
  */
 import { execFileSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
+import { repoRoot } from "./lib/root.mjs";
 
-const repo = join(dirname(fileURLToPath(import.meta.url)), "..");
-const out = join(repo, ".cache-tests", "highlight-tokens.test.mjs");
+const out = join(repoRoot, ".cache-tests", "highlight-tokens.test.mjs");
 
 execFileSync(
-  join(repo, "node_modules", ".bin", "esbuild"),
+  join(repoRoot, "node_modules", ".bin", "esbuild"),
   [
-    join(repo, "tests", "highlight-tokens.test.mts"),
+    join(repoRoot, "tests", "highlight-tokens.test.mts"),
     "--bundle",
     "--format=esm",
     "--platform=node",

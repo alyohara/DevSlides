@@ -4,16 +4,15 @@
  * the repo's esbuild, then runs them with node's built-in test runner.
  */
 import { execFileSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
+import { repoRoot } from "./lib/root.mjs";
 
-const repo = join(dirname(fileURLToPath(import.meta.url)), "..");
-const out = join(repo, ".cache-tests", "stack-targeting.test.mjs");
+const out = join(repoRoot, ".cache-tests", "stack-targeting.test.mjs");
 
 execFileSync(
-  join(repo, "node_modules", ".bin", "esbuild"),
+  join(repoRoot, "node_modules", ".bin", "esbuild"),
   [
-    join(repo, "tests", "stack-targeting.test.mts"),
+    join(repoRoot, "tests", "stack-targeting.test.mts"),
     "--bundle",
     "--format=esm",
     "--platform=node",

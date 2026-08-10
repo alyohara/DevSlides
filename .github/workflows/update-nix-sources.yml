@@ -15,6 +15,9 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    # Skip prerelease releases (e.g. v1.2.3-rc.1 and the build/** releases
+    # published by release.yml) — nix sources must only pin stable releases.
+    if: github.event_name == 'workflow_dispatch' || !github.event.release.prerelease
 
     steps:
       # On a `release` event the default checkout lands on the tag (detached
@@ -32,22 +35,112 @@ jobs:
             v*) TAG="$RAW_TAG" ;;
             *) TAG="v$RAW_TAG" ;;
           esac
+          VERSION="${TAG#v}"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          # Only clean stable tags (vX.Y.Z) update nix sources. Prerelease,
+          # build-branch, and malformed tags produce asset names that never
+          # exist; skip them with a clear message instead of timing out the
+          # download poll below.
+          if [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Download release assets
+      - name: Wait for and download release assets
+        if: steps.tag.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.tag.outputs.tag }}
           VERSION: ${{ steps.tag.outputs.version }}
         run: |
-          gh release download "$TAG" \
-            --repo codewiththiha/OpenSlides \
-            --pattern "OpenSlides_${VERSION}_amd64.deb" \
-            --pattern "OpenSlides_x64.app.tar.gz" \
-            --pattern "OpenSlides_aarch64.app.tar.gz"
+          set -euo pipefail
+          expected=(
+            "OpenSlides_${VERSION}_amd64.deb"
+            "OpenSlides_x64.app.tar.gz"
+            "OpenSlides_aarch64.app.tar.gz"
+          )
+
+          asset_names() {
+            gh release view "$TAG" --repo codewiththiha/OpenSlides \
+              --json assets --jq '.assets[].name' 2>/dev/null || true
+          }
+
+          # `release: [published]` fires the moment tauri-action creates the
+          # release, which can be minutes before its macOS legs finish uploading
+          # their tarballs. Poll the assets API (a cheap call) until every
+          # expected name exists, then download each exactly once — the macOS
+          # legs routinely lag 15+ minutes, so re-downloading the already-fixed
+          # deb every iteration would waste hundreds of MB of egress.
+          deadline=$((SECONDS + 1800))
+          names=""
+          while (( SECONDS < deadline )); do
+            names=$(asset_names)
+            missing=0
+            for f in "${expected[@]}"; do
+              if ! grep -qxF "$f" <<<"$names"; then
+                echo "waiting for $f..."
+                missing=1
+              fi
+            done
+            (( missing == 0 )) && break
+            sleep 10
+          done
+          for f in "${expected[@]}"; do
+            grep -qxF "$f" <<<"$names" \
+              || { echo "release asset still missing: $f" >&2; exit 1; }
+          done
+
+          # Download into a fresh temp dir, then verify each file's byte count
+          # against the size the API reports. gh writes straight to the final
+          # filename with no atomic rename, so a transfer cut mid-body would
+          # otherwise leave a truncated file that `test -s` accepts — and a
+          # wrong SRI hash would be committed to nix/sources.json.
+          tmpdir=$(mktemp -d)
+          trap 'rm -rf "$tmpdir"' EXIT
+          for attempt in 1 2 3; do
+            gh release download "$TAG" \
+              --repo codewiththiha/OpenSlides \
+              --pattern "OpenSlides_${VERSION}_amd64.deb" \
+              --pattern "OpenSlides_x64.app.tar.gz" \
+              --pattern "OpenSlides_aarch64.app.tar.gz" \
+              --dir "$tmpdir" || true
+
+            ok=1
+            for f in "${expected[@]}"; do
+              want=$(gh release view "$TAG" --repo codewiththiha/OpenSlides \
+                --json assets --jq ".assets[] | select(.name == \"$f\") | .size" 2>/dev/null)
+              # wc right-pads its output (e.g. "     100"), so strip whitespace
+              # before comparing; a missing file yields 0.
+              have=$(wc -c < "$tmpdir/$f" 2>/dev/null | tr -d '[:space:]')
+              have=${have:-0}
+              if [[ "$have" != "$want" ]]; then
+                echo "size mismatch for $f (have=$have want=$want); retrying" >&2
+                ok=0
+                break
+              fi
+            done
+            (( ok == 1 )) && break
+            # Next attempt re-downloads over the same names (gh clobbers), so a
+            # truncated file from a failed attempt is simply replaced.
+          done
+
+          for f in "${expected[@]}"; do
+            want=$(gh release view "$TAG" --repo codewiththiha/OpenSlides \
+              --json assets --jq ".assets[] | select(.name == \"$f\") | .size" 2>/dev/null)
+            have=$(wc -c < "$tmpdir/$f" 2>/dev/null | tr -d '[:space:]')
+            have=${have:-0}
+            test "$have" = "$want" \
+              || { echo "asset $f failed size verification after retries" >&2; exit 1; }
+          done
+
+          mv "$tmpdir"/* .
+          echo "All release assets downloaded and verified"
+          ls -la "${expected[@]}"
 
       - name: Compute SRI hashes
+        if: steps.tag.outputs.skip != 'true'
         id: hashes
         env:
           VERSION: ${{ steps.tag.outputs.version }}
@@ -61,6 +154,7 @@ jobs:
           echo "aarch64-darwin=sha256-$(hash_sri "OpenSlides_aarch64.app.tar.gz")" >> "$GITHUB_OUTPUT"
 
       - name: Update nix/sources.json
+        if: steps.tag.outputs.skip != 'true'
         run: |
           cat > nix/sources.json <<- EOF
           {
@@ -74,6 +168,7 @@ jobs:
           EOF
 
       - name: Create PR
+        if: steps.tag.outputs.skip != 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           commit-message: "chore: update nix sources to ${{ steps.hashes.outputs.version }}"

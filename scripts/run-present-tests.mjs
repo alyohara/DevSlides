@@ -6,13 +6,13 @@
  * runtime stubbed) using the repo's esbuild, then runs node --test.
  */
 import { execFileSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { mkdirSync } from "node:fs";
 import { build } from "esbuild";
+import { repoRoot } from "./lib/root.mjs";
 import { sveltePlugin, SVELTE_CONDITIONS } from "./lib/esbuild-svelte.mjs";
 
-const repo = join(dirname(fileURLToPath(import.meta.url)), "..");
+const repo = repoRoot;
 const outDir = join(repo, ".cache-tests");
 mkdirSync(outDir, { recursive: true });
 
