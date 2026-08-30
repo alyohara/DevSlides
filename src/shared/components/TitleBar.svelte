@@ -52,6 +52,7 @@
   )}
 >
   <div
+    data-tauri-drag-region="true"
     class="flex min-w-0 flex-1 items-center gap-2"
     style:padding-left={gutterPx > 0 ? `${gutterPx}px` : "0.75rem"}
   >
@@ -62,7 +63,11 @@
       >
     {/if}
   </div>
-  <div class="flex shrink-0 items-center gap-1" style:padding-right="0.75rem">
+  <div
+    data-tauri-drag-region="true"
+    class="flex shrink-0 items-center gap-1"
+    style:padding-right="0.75rem"
+  >
     {@render trailing?.()}
   </div>
 </div>
