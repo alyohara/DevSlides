@@ -1,3 +1,5 @@
+import { clampRectToViewport } from "$lib/lib/menu-position";
+
 interface UseSlideCardHoverPreviewArgs {
   isOverlay: boolean;
   enableHoverPreview: () => boolean;
@@ -22,16 +24,11 @@ export function createSlideCardHoverPreview(
       if (!rect) return;
       const width = 300;
       const height = 170;
-      const left = Math.min(
-        Math.max(8, rect.left),
-        Math.max(8, window.innerWidth - width - 8),
-      );
+      // Prefer the preview above the card, flipping below when there is no
+      // room; keep the whole rect inside the viewport either way.
       const above = rect.top - height - 8;
-      const top =
-        above >= 8
-          ? above
-          : Math.min(rect.bottom + 8, window.innerHeight - height - 8);
-      hoverPosition = { left, top: Math.max(8, top) };
+      const top = above >= 8 ? above : rect.bottom + 8;
+      hoverPosition = clampRectToViewport(rect.left, top, width, height, 8);
       showHoverPreview = true;
     }, 300);
   }

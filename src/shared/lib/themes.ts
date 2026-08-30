@@ -1,11 +1,5 @@
 import { supportedThemeOptions } from "./backend-config.svelte";
-import {
-  THEMES as FALLBACK_THEMES,
-  type ThemeMeta,
-  type ThemeName,
-} from "./theme-meta";
-
-export { THEMES } from "./theme-meta";
+import type { ThemeMeta, ThemeName } from "./theme-meta";
 
 /**
  * Runtime theme list from the backend, with the static metadata table as a
@@ -14,12 +8,6 @@ export { THEMES } from "./theme-meta";
 export function availableThemes(): ThemeMeta[] {
   return supportedThemeOptions();
 }
-
-/** Back-compat static options; runtime consumers should prefer themeOptions(). */
-export const THEME_OPTIONS = FALLBACK_THEMES.map(({ value, label }) => ({
-  value,
-  label,
-}));
 
 export function themeOptions(): Array<{ value: ThemeName; label: string }> {
   return availableThemes().map(({ value, label }) => ({ value, label }));

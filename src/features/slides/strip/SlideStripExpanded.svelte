@@ -30,6 +30,15 @@
     StripItem,
   } from "../slide-strip-state.svelte";
   import type { createSlideStripDnd } from "../dnd/slide-dnd.svelte";
+  import {
+    STACK_ZONE_INSET_X_PCT,
+    STACK_ZONE_INSET_Y_PCT,
+  } from "../dnd/stack-hover-geometry";
+  import {
+    STACK_CARD_ATTR,
+    STACK_SECTION_ATTR,
+    STACK_TARGET_ATTR,
+  } from "$lib/lib/dnd-dom";
   import type { createSlideStripSelection } from "./SlideStripSelectionController.svelte";
   import type { createSlideStripContextMenu } from "./SlideStripContextMenuController.svelte";
   import type { createSlideStripSearchDialog } from "./SlideStripSearchDialogController.svelte";
@@ -43,6 +52,7 @@
     searchDlg,
     rename,
     searchQuery,
+    isFiltering,
     theme,
     language,
     activeHighlightIndex,
@@ -59,6 +69,7 @@
     searchDlg: ReturnType<typeof createSlideStripSearchDialog>;
     rename: ReturnType<typeof createRenameState>;
     searchQuery: string;
+    isFiltering: boolean;
     theme: string;
     language: string;
     activeHighlightIndex: number;
@@ -72,9 +83,7 @@
     flipMs: number;
   } = $props();
 
-  const dragDisabled = $derived(
-    searchQuery.trim().length > 0 || rename.renamingId !== null,
-  );
+  const dragDisabled = $derived(isFiltering || rename.renamingId !== null);
 
   // Cards read rename/action wiring from context (§2.1) — only per-card
   // data (slide, tab stop, multi-select state) stays in props. Provided
@@ -107,9 +116,10 @@
   {@const isDraggingOther =
     dnd.draggingId !== null && dnd.draggingId !== ownerItemId}
   <div
-    data-stack-target={targetId}
+    {...{ [STACK_TARGET_ATTR]: targetId }}
+    style="inset-inline: {STACK_ZONE_INSET_X_PCT}%; inset-block: {STACK_ZONE_INSET_Y_PCT}%"
     class={cn(
-      "pointer-events-none absolute inset-x-[16%] inset-y-[12%] z-30 rounded-lg border-2 border-dashed transition-all duration-150",
+      "pointer-events-none absolute z-30 rounded-lg border-2 border-dashed transition-all duration-150",
       isDraggingOther ? "opacity-100" : "opacity-0",
       dnd.stackHoverId === targetId
         ? "scale-[1.03] border-solid border-primary bg-primary/20 shadow-lg ring-2 ring-primary ring-offset-1 ring-offset-background"
@@ -163,8 +173,10 @@
       {#each item.slides as slide (slide.id)}
         <div
           class="relative shrink-0"
-          data-stack-card={slide.id}
-          data-stack-section={slide.sectionId?.trim() ?? ""}
+          {...{
+            [STACK_CARD_ATTR]: slide.id,
+            [STACK_SECTION_ATTR]: slide.sectionId?.trim() ?? "",
+          }}
         >
           {@render stackTargetOverlay(slide.id, item.id)}
           {@render cardFor(slide)}
@@ -175,8 +187,10 @@
     {@const firstSlide = item.slides[0]!}
     <div
       class="relative shrink-0"
-      data-stack-card={firstSlide.id}
-      data-stack-section={firstSlide.sectionId?.trim() ?? ""}
+      {...{
+        [STACK_CARD_ATTR]: firstSlide.id,
+        [STACK_SECTION_ATTR]: firstSlide.sectionId?.trim() ?? "",
+      }}
     >
       {@render stackTargetOverlay(firstSlide.id, item.id)}
       {#if item.slides.length > 1}

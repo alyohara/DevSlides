@@ -20,20 +20,26 @@ export function createSlideStripRename(args: {
   return createRenameState(async (id: string, name: string) => {
     const finalName = name || "Untitled slide";
     await new Promise<void>((resolve) => {
-      args.updateSettings.mutate(
-        { slideId: id, payload: { name: finalName } },
-        {
-          onSuccess: () => {
-            args.setOrdered(
-              args
-                .ordered()
-                .map((s) => (s.id === id ? { ...s, name: finalName } : s)),
-            );
-            resolve();
+      try {
+        args.updateSettings.mutate(
+          { slideId: id, payload: { name: finalName } },
+          {
+            onSuccess: () => {
+              args.setOrdered(
+                args
+                  .ordered()
+                  .map((s) => (s.id === id ? { ...s, name: finalName } : s)),
+              );
+              resolve();
+            },
+            onError: () => resolve(),
           },
-          onError: () => resolve(),
-        },
-      );
+        );
+      } catch {
+        // A synchronous throw (e.g. validation) must still settle the
+        // promise, or the card would stay in renaming state forever.
+        resolve();
+      }
     });
   });
 }

@@ -10,6 +10,19 @@ export interface GroupChunk<T> {
  * Groups consecutive items with the same non-empty group/section ID into chunks.
  * Single items or stacks with only 1 item are returned with `kind: "single"`.
  */
+/**
+ * Stable identity of a chunk: the group id when it is a real stack (2+
+ * items), otherwise the single item's id. Consumers (dnd decisions, cell
+ * rendering, expansion tracking) must agree on this to hit the same target.
+ */
+export function chunkIdOf<T extends { id: string }>(
+  chunk: GroupChunk<T>,
+): string {
+  return chunk.kind === "stack" && chunk.items.length > 1
+    ? chunk.groupId!
+    : chunk.items[0]!.id;
+}
+
 export function chunkConsecutive<T>(
   items: T[],
   getGroupId?: (item: T) => string | null | undefined,

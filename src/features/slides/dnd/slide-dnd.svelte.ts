@@ -9,6 +9,13 @@
  */
 import { untrack } from "svelte";
 import { TRIGGERS, SOURCES, type DndEvent } from "svelte-dnd-action";
+import {
+  DRAGGED_CLONE_SELECTOR,
+  STACK_CARD_ATTR,
+  STACK_CARD_SELECTOR,
+  STACK_SECTION_ATTR,
+} from "$lib/lib/dnd-dom";
+import { createRafThrottle } from "$lib/lib/raf";
 import { pointerInsertIndex } from "$lib/lib/stack-targeting";
 import type { Slide } from "$lib/types";
 import type { StripItem } from "../slide-strip-state.svelte";
@@ -16,8 +23,6 @@ import { findStackHoverId } from "./stack-hover-geometry";
 import { pointerShadowReorder, shadowIndexOf } from "./pointer-insertion";
 import { decideFinalize } from "./dnd-finalize";
 import type { StackHoverElement } from "./dnd-types";
-
-const DRAGGED_CLONE_SELECTOR = "#dnd-action-dragged-el";
 
 export function createSlideStripDnd(args: {
   baseItems: () => StripItem[];
@@ -58,23 +63,22 @@ export function createSlideStripDnd(args: {
 
   /** Snapshot the stackable cards on the strip for the pure hit test. */
   function stackHoverElements(): StackHoverElement[] {
-    const els = document.querySelectorAll<HTMLElement>("[data-stack-card]");
+    const els = document.querySelectorAll<HTMLElement>(STACK_CARD_SELECTOR);
     const out: StackHoverElement[] = [];
     for (const el of els) {
       // Ignore the lib-generated dragged clone (never a valid target).
       if (el.closest(DRAGGED_CLONE_SELECTOR)) continue;
-      const id = el.getAttribute("data-stack-card");
+      const id = el.getAttribute(STACK_CARD_ATTR);
       if (!id) continue;
       out.push({
         id,
-        section: el.dataset.stackSection?.trim() || null,
+        section: el.getAttribute(STACK_SECTION_ATTR)?.trim() || null,
         rect: el.getBoundingClientRect(),
       });
     }
     return out;
   }
 
-  let hoverRaf = 0;
   function updateStackHover() {
     if (!draggingId || !dragSource) {
       stackHoverId = null;
@@ -89,16 +93,13 @@ export function createSlideStripDnd(args: {
     });
   }
 
+  /* One hit-test per frame max — keeps 60fps during drag. */
+  const hoverTestThrottle = createRafThrottle(() => updateStackHover());
+
   function onPointerMove(e: PointerEvent) {
     pointer.x = e.clientX;
     pointer.y = e.clientY;
-    // One hit-test per frame max — keeps 60fps during drag.
-    if (!hoverRaf) {
-      hoverRaf = requestAnimationFrame(() => {
-        hoverRaf = 0;
-        updateStackHover();
-      });
-    }
+    hoverTestThrottle.schedule();
   }
 
   function handleConsider(e: CustomEvent<DndEvent<StripItem>>) {
@@ -168,10 +169,7 @@ export function createSlideStripDnd(args: {
   function handleFinalize(e: CustomEvent<DndEvent<StripItem>>) {
     const { items: next } = e.detail;
     window.removeEventListener("pointermove", onPointerMove);
-    if (hoverRaf) {
-      cancelAnimationFrame(hoverRaf);
-      hoverRaf = 0;
-    }
+    hoverTestThrottle.cancel();
     // Refresh from the FINAL pointer position, so the drop lands on the
     // card actually under the cursor at release.
     updateStackHover();

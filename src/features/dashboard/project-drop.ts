@@ -1,4 +1,5 @@
-import type { GroupChunk } from "$lib/lib/grouping";
+import { chunkIdOf, type GroupChunk } from "$lib/lib/grouping";
+import { isSelfStackTarget } from "$lib/lib/stacking";
 import type { ProjectSummary } from "$lib/types";
 import type {
   ProjectDragPayload,
@@ -19,12 +20,6 @@ type ProjectDropDecision =
 /** Fan item must travel this far from its origin to count as "unstack". */
 const UNSTACK_DISTANCE = 120;
 
-export function chunkIdOf(chunk: GroupChunk<ProjectSummary>): string {
-  return chunk.kind === "stack" && chunk.items.length > 1
-    ? chunk.groupId!
-    : chunk.items[0]!.id;
-}
-
 function sourceIdsOf(payload: ProjectDragPayload): string[] {
   if (payload.kind === "fan-item") return [payload.project.id];
   return payload.chunk.items.map((project) => project.id);
@@ -44,12 +39,15 @@ export function decideProjectDrop(
     const sourceIds = sourceIdsOf(payload);
     const sourceCellId =
       payload.kind === "project-cell" ? chunkIdOf(payload.chunk) : null;
-    if (
-      targetId &&
-      sourceIds.length > 0 &&
-      sourceCellId !== targetChunkId &&
-      !sourceIds.includes(targetId)
-    ) {
+    const selfTarget = targetId
+      ? isSelfStackTarget({
+          targetId,
+          targetStackKey: targetChunkId,
+          draggingIds: sourceIds,
+          draggedStackKey: sourceCellId,
+        })
+      : false;
+    if (targetId && sourceIds.length > 0 && !selfTarget) {
       return { kind: "stack", sourceIds, targetId };
     }
   }

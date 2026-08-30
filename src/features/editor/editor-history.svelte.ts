@@ -34,22 +34,23 @@ export function createEditorHistory(args: {
     return true;
   }
 
+  function exec(direction: "undo" | "redo") {
+    const el = args.textarea();
+    if (!el || document.activeElement !== el) return;
+    if (
+      !applyHistorySnapshot(direction) &&
+      typeof document.execCommand === "function"
+    ) {
+      document.execCommand(direction);
+    }
+  }
+
   $effect(() => {
-    const exec = (direction: "undo" | "redo") => {
-      const el = args.textarea();
-      if (!el || document.activeElement !== el) return;
-      if (
-        !applyHistorySnapshot(direction) &&
-        typeof document.execCommand === "function"
-      ) {
-        document.execCommand(direction);
-      }
-    };
     return onUndoRedo(
       () => exec("undo"),
       () => exec("redo"),
     );
   });
 
-  return { applyHistorySnapshot };
+  return { exec };
 }

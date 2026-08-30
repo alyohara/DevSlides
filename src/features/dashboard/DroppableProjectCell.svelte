@@ -6,7 +6,8 @@
    */
   import { cn } from "$lib/lib/utils";
   import { type ProjectSummary } from "$lib/types";
-  import { type GroupChunk } from "$lib/lib/grouping";
+  import { chunkIdOf, type GroupChunk } from "$lib/lib/grouping";
+  import { CHUNK_ID_ATTR } from "$lib/lib/dnd-dom";
   import StackDeck from "$lib/ui/stack/StackDeck.svelte";
   import ProjectCard from "./ProjectCard.svelte";
   import {
@@ -30,7 +31,7 @@
 
   const topProject = $derived(chunk.items[0]!);
   const isStack = $derived(chunk.kind === "stack" && chunk.items.length > 1);
-  const id = $derived(isStack ? chunk.groupId! : topProject.id);
+  const id = $derived(chunkIdOf(chunk));
 
   let cellEl = $state<HTMLDivElement | null>(null);
 
@@ -39,12 +40,7 @@
     Boolean(
       session?.active &&
       session.payload.kind === "project-cell" &&
-      String(
-        session.payload.chunk.kind === "stack" &&
-          session.payload.chunk.items.length > 1
-          ? session.payload.chunk.groupId
-          : session.payload.chunk.items[0]?.id,
-      ) === id,
+      chunkIdOf(session.payload.chunk) === id,
     ),
   );
   const isHovered = $derived(
@@ -63,7 +59,7 @@
 
 <div
   bind:this={cellEl}
-  data-chunk-id={id}
+  {...{ [CHUNK_ID_ATTR]: id }}
   onpointerdown={onPointerDown}
   role="presentation"
   class={cn(

@@ -3,7 +3,7 @@
  * is expanded, kept in sync with the live project list, plus the
  * auto-close rule when a stack shrinks to nearly nothing.
  */
-import type { GroupChunk } from "$lib/lib/grouping";
+import { chunkIdOf, type GroupChunk } from "$lib/lib/grouping";
 import type { ProjectSummary } from "$lib/types";
 
 export function createStackSpreadState(args: {
@@ -20,11 +20,7 @@ export function createStackSpreadState(args: {
     if (!info) return null;
     const latest = args
       .chunks()
-      .find(
-        (c) =>
-          (c.groupId && c.groupId === info.chunk.groupId) ||
-          (!c.groupId && c.items[0]?.id === info.chunk.items[0]?.id),
-      );
+      .find((c) => chunkIdOf(c) === chunkIdOf(info.chunk));
     if (!latest || latest.items.length <= 1) return null;
     return latest;
   });

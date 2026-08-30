@@ -78,6 +78,9 @@ export function createSlideStripSearch(args: {
     rawSearchQuery = "";
   }
 
+  /** True while a search term is active (not just whitespace). */
+  const isFiltering = $derived(searchQuery.trim().length > 0);
+
   return {
     get rawSearchQuery() {
       return rawSearchQuery;
@@ -87,6 +90,9 @@ export function createSlideStripSearch(args: {
     },
     get searchQuery() {
       return searchQuery;
+    },
+    get isFiltering() {
+      return isFiltering;
     },
     clearSearch,
     get filteredOrdered() {

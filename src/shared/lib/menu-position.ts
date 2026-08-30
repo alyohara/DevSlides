@@ -3,6 +3,21 @@
  * point, keeping it fully inside the window. Menus open ABOVE the point and
  * flip below when there is no room.
  */
+
+/** Clamp a rect's top-left corner so the whole rect stays inside the window. */
+export function clampRectToViewport(
+  left: number,
+  top: number,
+  width: number,
+  height: number,
+  edge = 8,
+): { left: number; top: number } {
+  return {
+    left: Math.max(edge, Math.min(left, window.innerWidth - width - edge)),
+    top: Math.max(edge, Math.min(top, window.innerHeight - height - edge)),
+  };
+}
+
 interface ClampMenuPositionOptions {
   /** Pointer point (client coordinates). */
   x: number;
@@ -24,13 +39,17 @@ export function clampMenuPosition({
   gap = 8,
   edge = 8,
 }: ClampMenuPositionOptions): { x: number; y: number } {
-  let left = x + gap;
   let top = y - height - gap;
-  if (left + width > window.innerWidth - edge) {
-    left = Math.max(edge, window.innerWidth - width - edge);
-  }
   if (top < edge) {
+    // No room above the pointer — flip to below it.
     top = Math.min(window.innerHeight - height - edge, y + gap);
   }
-  return { x: left, y: top };
+  const { left, top: clampedTop } = clampRectToViewport(
+    x + gap,
+    top,
+    width,
+    height,
+    edge,
+  );
+  return { x: left, y: clampedTop };
 }

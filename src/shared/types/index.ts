@@ -6,16 +6,9 @@
 
 type CodeAlign = "left" | "center";
 
-export type { LanguageOption } from "$lib/lib/language-meta";
-export { FALLBACK_SUPPORTED_LANGUAGES as SUPPORTED_LANGUAGES } from "$lib/lib/language-meta";
-
 export type { ThemeName } from "$lib/lib/theme-meta";
 
-export {
-  THEME_OPTIONS,
-  themeBackground,
-  fallbackForeground,
-} from "$lib/lib/themes";
+export { themeBackground, fallbackForeground } from "$lib/lib/themes";
 
 export interface Highlight {
   id: string;

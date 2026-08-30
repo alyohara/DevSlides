@@ -8,6 +8,9 @@
  *  - the moving overlay clone is rendered by ProjectGrid
  */
 import type { GroupChunk } from "$lib/lib/grouping";
+import { CHUNK_ID_ATTR, CHUNK_SELECTOR } from "$lib/lib/dnd-dom";
+import { pointInRect } from "$lib/lib/geometry";
+import { createRafThrottle } from "$lib/lib/raf";
 import type { ProjectSummary } from "$lib/types";
 
 export type ProjectDragPayload =
@@ -46,15 +49,13 @@ export function setProjectDropHandler(fn: ProjectDropHandler | null) {
   dropHandler = fn;
 }
 
-const CHUNK_SELECTOR = "[data-chunk-id]";
-
 /** Hit test: the cell whose rect contains the pointer. */
 function hitChunk(x: number, y: number): string | null {
   const els = document.querySelectorAll<HTMLElement>(CHUNK_SELECTOR);
   for (const el of els) {
     const r = el.getBoundingClientRect();
-    if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
-      return el.getAttribute("data-chunk-id");
+    if (pointInRect(x, y, r)) {
+      return el.getAttribute(CHUNK_ID_ATTR);
     }
   }
   return null;
@@ -63,17 +64,15 @@ function hitChunk(x: number, y: number): string | null {
 const ACTIVE_CLASS = "project-dnd-active";
 
 /* Hit-testing queries the DOM, so it runs at most once per frame. */
-let hitRaf = 0;
+const hitTestThrottle = createRafThrottle(() => {
+  const s = projectDnd.session;
+  if (s?.active) {
+    s.hoverChunkId = hitChunk(s.x, s.y);
+  }
+});
 
 function scheduleHitTest() {
-  if (hitRaf) return;
-  hitRaf = requestAnimationFrame(() => {
-    hitRaf = 0;
-    const s = projectDnd.session;
-    if (s?.active) {
-      s.hoverChunkId = hitChunk(s.x, s.y);
-    }
-  });
+  hitTestThrottle.schedule();
 }
 
 function onMove(e: PointerEvent) {
@@ -105,10 +104,7 @@ function cleanup() {
   window.removeEventListener("pointermove", onMove);
   window.removeEventListener("pointerup", onUp);
   window.removeEventListener("pointercancel", onUp);
-  if (hitRaf) {
-    cancelAnimationFrame(hitRaf);
-    hitRaf = 0;
-  }
+  hitTestThrottle.cancel();
   document.documentElement.classList.remove(ACTIVE_CLASS);
 }
 

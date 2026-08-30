@@ -5,23 +5,15 @@ import type { Highlight, Slide } from "$lib/types";
 export const DEFAULT_SLIDE_DURATION_MS = 3000;
 /** Default slide transition duration in milliseconds. */
 export const DEFAULT_SLIDE_TRANSITION_MS = 750;
-/** Default slide stagger count. */
-export const DEFAULT_SLIDE_STAGGER = 5;
 
 // ── Default language / theme ─────────────────────────────────────────
 export const DEFAULT_LANGUAGE = "typescript";
 export const DEFAULT_THEME = "dark-plus";
-export const DEFAULT_IMPORT_PROJECT_NAME = "Imported Presentation";
 
-// ── Project settings defaults (mirror Rust serde defaults) ───────────
-export const DEFAULT_FONT_SIZE = 16;
-export const DEFAULT_LINE_HEIGHT = 1.5;
+// ── Project settings defaults ────────────────────────────────────────
 export const DEFAULT_EDITOR_FONT_SIZE = 14;
-export const DEFAULT_GLOBAL_TRANSITION_DURATION = 700;
-export const DEFAULT_GLOBAL_STAGGER = 3;
 
 // ── Highlight defaults ───────────────────────────────────────────────
-export const DEFAULT_HIGHLIGHT_DIM_AMOUNT = 75;
 export const DEFAULT_GLOBAL_DIM_AMOUNT = 80;
 export const DEFAULT_GLOBAL_SIZE_UP_AMOUNT = 105;
 export const DEFAULT_HIGHLIGHT_DIM_TRANSITION = 500;

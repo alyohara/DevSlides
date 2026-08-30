@@ -72,6 +72,7 @@
     ordered: () => strip.ordered,
   });
   const searchQuery = $derived(search.searchQuery);
+  const isFiltering = $derived(search.isFiltering);
   const filteredOrdered = $derived(search.filteredOrdered);
 
   const strip = createSlideStripState({
@@ -95,7 +96,7 @@
 
   const dnd = createSlideStripDnd({
     baseItems: () => strip.baseItems,
-    filtering: () => searchQuery.trim().length > 0,
+    filtering: () => isFiltering,
     resolveSourceIds,
     ordered: () => strip.ordered,
     setOrdered: (slides: Slide[]) => (strip.ordered = slides),
@@ -103,15 +104,21 @@
     onReorder: (ids, opts) => reorderSlides(ids, opts),
   });
 
-  // Controllers. Selection and the context menu reference each other, so
-  // the selection controller is created last and read lazily (via `refs`)
-  // by the menu callbacks.
-  const refs = {} as {
-    selection?: ReturnType<typeof createSlideStripSelection>;
+  // Controllers. Selection and the context menu reference each other, so the
+  // selection controller is created last and read lazily — the menu callbacks
+  // only ever run on user events long after creation.
+  type StripSelection = ReturnType<typeof createSlideStripSelection>;
+  let selectionRef: StripSelection | undefined;
+  const getSelection = (): StripSelection => {
+    const selection = selectionRef;
+    if (!selection) {
+      throw new Error("slide-strip selection read before it was created");
+    }
+    return selection;
   };
   const menuCtl = createSlideStripContextMenu({
-    isMultiSelectMode: () => refs.selection!.isMultiSelectMode,
-    toggleSlideSelection: (id) => refs.selection!.toggleSlideSelection(id),
+    isMultiSelectMode: () => getSelection().isMultiSelectMode,
+    toggleSlideSelection: (id) => getSelection().toggleSlideSelection(id),
   });
 
   const rename = createSlideStripRename({
@@ -126,14 +133,14 @@
     pendingFocusId: strip.pendingFocusId,
   });
 
-  refs.selection = createSlideStripSelection({
+  selectionRef = createSlideStripSelection({
     ordered: () => strip.ordered,
     menuCtl: () => menuCtl,
     reorderSlides,
     stackSlides,
     deleter,
   });
-  const selection = refs.selection;
+  const selection = getSelection();
 
   const searchDlg = createSlideStripSearchDialog({ search });
 
@@ -151,6 +158,7 @@
     {searchDlg}
     {rename}
     {searchQuery}
+    {isFiltering}
     {theme}
     {language}
     {activeHighlightIndex}

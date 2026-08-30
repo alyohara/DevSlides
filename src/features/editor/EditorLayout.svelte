@@ -34,7 +34,9 @@
     PANEL_SLIDES_COLLAPSED_SIZE,
   } from "$lib/constants";
 
-  const CODE_COLLAPSE_THRESHOLD = PANEL_SLIDES_MIN;
+  // Sizes at/below a panel's expanded minimum are "already collapsed" —
+  // never remembered as the restore target (mirrors SLIDES_COLLAPSE_THRESHOLD).
+  const CODE_COLLAPSE_THRESHOLD = PANEL_CODE_MIN;
   const SLIDES_MIN_EXPANDED_SIZE = PANEL_SLIDES_MIN;
   const SLIDES_COLLAPSE_THRESHOLD = SLIDES_MIN_EXPANDED_SIZE;
   const CODE_COLLAPSED_SIZE = PANEL_CODE_COLLAPSED_SIZE;

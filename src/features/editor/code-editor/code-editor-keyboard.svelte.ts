@@ -1,8 +1,9 @@
 /**
- * Code-editor keyboard handling: undo/redo history, the strip's global
- * search shortcut, find-bar escape, and the smart Tab handler.
+ * Code-editor keyboard handling: undo/redo history, find-bar escape, and the
+ * smart Tab handler. The global Cmd/Ctrl+F → centered-finder shortcut is
+ * owned by the window-level handler in editor/keyboard.svelte.ts.
  */
-import { emitOpenSearch } from "$lib/lib/app-events";
+import { isModKey } from "$lib/lib/keyboard";
 import { createEditorHistory } from "@/features/editor/editor-history.svelte";
 import { createTabKeyHandler } from "@/features/editor/tab-key";
 import type { createCaretSync } from "@/features/editor/caret.svelte";
@@ -17,7 +18,7 @@ export function createCodeEditorKeyboard(args: {
   isFindOpen: () => boolean;
   closeFind: () => void;
 }) {
-  const { applyHistorySnapshot } = createEditorHistory({
+  const { exec } = createEditorHistory({
     slideId: args.slideId,
     textarea: args.textareaEl,
     handleChange: args.handleChange,
@@ -32,20 +33,13 @@ export function createCodeEditorKeyboard(args: {
   function handleKeyDown(
     e: KeyboardEvent & { currentTarget: HTMLTextAreaElement },
   ) {
-    const isMod = e.metaKey || e.ctrlKey;
+    const isMod = isModKey(e);
     const key = e.key.toLowerCase();
     if (isMod && (key === "z" || key === "y")) {
       e.preventDefault();
       const direction =
         key === "y" || (key === "z" && e.shiftKey) ? "redo" : "undo";
-      if (!applyHistorySnapshot(direction)) {
-        document.execCommand(direction);
-      }
-      return;
-    }
-    if (isMod && key === "f" && !e.shiftKey) {
-      e.preventDefault();
-      emitOpenSearch();
+      exec(direction);
       return;
     }
     if (e.key === "Escape" && args.isFindOpen()) {

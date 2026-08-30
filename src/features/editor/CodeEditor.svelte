@@ -30,7 +30,7 @@
   import { createCodeEditorApply } from "./code-editor/code-editor-apply.svelte";
   import { createCodeEditorFind } from "./code-editor/code-editor-find.svelte";
   import { createCodeEditorKeyboard } from "./code-editor/code-editor-keyboard.svelte";
-  import { createCodeEditorHighlighting } from "./code-editor/code-editor-highlighting.svelte";
+  import { createHighlightCrud } from "@/features/highlights/highlight-crud.svelte";
   import { createCodeEditorSlideNav } from "./code-editor/code-editor-slide-nav.svelte";
   import FindReplaceBar from "@/features/editor/FindReplaceBar.svelte";
   import CodeEditorHeader from "@/features/editor/CodeEditorHeader.svelte";
@@ -126,20 +126,19 @@
   const { goSlide } = createCodeEditorSlideNav({
     slides: () => project.slides,
     currentIndex: () => currentIndex,
-    slideId: () => slideId,
-    textareaEl: () => st.textareaEl,
+    saveCaret,
     save,
   });
 
   const currentHighlights = $derived(slide?.highlights ?? []);
 
-  const crud = createCodeEditorHighlighting({
+  const crud = createHighlightCrud({
     projectId,
     slideId: () => slideId,
     highlights: () => currentHighlights,
     code: () => code,
     highlightMode: () => st.highlightMode,
-    textareaEl: () => st.textareaEl,
+    textarea: () => st.textareaEl,
     saveCaret,
   });
 
@@ -147,7 +146,6 @@
     textarea: () => st.textareaEl,
     pre: () => st.preEl,
     gutter: () => st.gutterEl,
-    crud,
   });
 
   const gutterWidth = $derived(
@@ -196,7 +194,10 @@
       onKeyUp={(e) => crud.onKeyUp(e)}
       onSelect={() => crud.onSelect()}
       onBlur={saveCaret}
-      onScroll={syncScroll}
+      onScroll={() => {
+        crud.closeContextMenu();
+        syncScroll();
+      }}
       onContextMenu={(e) => crud.onContextMenu(e)}
       bind:gutterEl={st.gutterEl}
       bind:preEl={st.preEl}

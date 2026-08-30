@@ -1,4 +1,5 @@
 import { PROJECT_CARD_WIDTH, PROJECT_CARD_HEIGHT } from "./layout";
+import { FAN_STEP_X, FAN_CURVE_Y_PER_INDEX } from "$lib/lib/stacking";
 
 /**
  * Pure stack-fan geometry (§6.10): where the spread centers itself and how
@@ -6,10 +7,6 @@ import { PROJECT_CARD_WIDTH, PROJECT_CARD_HEIGHT } from "./layout";
  * choreography so the numbers stay testable and named.
  */
 
-/** Horizontal gap between fanned cards. */
-const FAN_STEP_X = 85;
-/** Vertical arc: cards further from the center dip this much per step. */
-const FAN_CURVE_Y_PER_INDEX = 12;
 /** Breathing room around the outermost cards. */
 const FAN_PADDING = 80;
 

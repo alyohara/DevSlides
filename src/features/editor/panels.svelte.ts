@@ -16,9 +16,7 @@ export interface PaneHandle {
   expand: () => void;
   getSize: () => number;
   isCollapsed: () => boolean;
-  isExpanded: () => boolean;
   resize: (size: number) => void;
-  getId: () => string;
 }
 
 interface UseCollapsiblePanelArgs {

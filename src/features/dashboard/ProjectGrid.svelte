@@ -9,7 +9,7 @@
   import DroppableProjectCell from "./DroppableProjectCell.svelte";
   import ProjectDragOverlay from "./ProjectDragOverlay.svelte";
   import StackSpread from "./StackSpread.svelte";
-  import { chunkConsecutive } from "$lib/lib/grouping";
+  import { chunkConsecutive, chunkIdOf } from "$lib/lib/grouping";
   import {
     stackProjectsMutation,
     unstackProjectsMutation,
@@ -19,7 +19,7 @@
     setProjectDropHandler,
     type ProjectDragSession,
   } from "@/features/dashboard/project-dnd.svelte";
-  import { chunkIdOf, decideProjectDrop } from "./project-drop";
+  import { decideProjectDrop } from "./project-drop";
   import { createProjectRowVirtualizer } from "./virtual-rows.svelte";
   import { createStackSpreadState } from "./stack-spread-state.svelte";
   import type { ProjectSummary } from "$lib/types";

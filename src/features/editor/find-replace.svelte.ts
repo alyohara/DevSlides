@@ -87,22 +87,26 @@ export function createFindReplace(args: Args) {
     args.applyCode(next);
   }
 
-  let wasOpen = false;
-
+  // Restart navigation at the first match whenever the match set changes
+  // (query, case mode, or code edit). The effect never reads
+  // currentMatchIndex, so the write cannot re-trigger it.
   $effect(() => {
-    const isOpen = open;
-    matches.length;
-    searchTerm;
+    void matches.length;
     currentMatchIndex = 0;
-    if (isOpen && !wasOpen && matches.length) {
-      requestAnimationFrame(() => selectMatch(0, false));
-    }
-    wasOpen = isOpen;
   });
 
   function openFind(prefill?: string) {
+    const justOpened = !open;
     open = true;
+    currentMatchIndex = 0;
     if (prefill && prefill.length < 100) searchTerm = prefill;
+    if (justOpened) {
+      // Select the first match on the next frame so the bar is laid out
+      // before the textarea selection is updated.
+      requestAnimationFrame(() => {
+        if (open && matches.length) selectMatch(0, false);
+      });
+    }
   }
 
   function close() {
