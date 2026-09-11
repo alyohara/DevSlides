@@ -1,5 +1,5 @@
 /**
- * Core domain types for OpenSlides desktop.
+ * Core domain types for DevSlides desktop.
  * Persistent data is owned by the Rust/SQLite backend;
  * these types mirror the IPC JSON contracts.
  */

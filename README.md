@@ -1,10 +1,11 @@
-# OpenSlides
+# DevSlides
 
-> **Fork by [alyohara](https://github.com/alyohara)** — based on [codewiththiha/OpenSlides](https://github.com/codewiththiha/OpenSlides).
+> **DevSlides is a fork of [OpenSlides](https://github.com/codewiththiha/OpenSlides) by [codewiththiha](https://github.com/codewiththiha).**
+> This fork is maintained by [alyohara](https://github.com/alyohara).
 
 **Beautiful code presentations for content creators, educators, and developers.**
 
-OpenSlides is a free, open-source, offline desktop app for turning code into polished slides with smooth, step-by-step transitions. It is a direct alternative to [codeslides.app](https://codeslides.app): create expressive code decks, keep your work on your own machine, and present without a subscription or internet connection.
+DevSlides (a fork of OpenSlides) is a free, open-source, offline desktop app for turning code into polished slides with smooth, step-by-step transitions. It is a direct alternative to [codeslides.app](https://codeslides.app): create expressive code decks, keep your work on your own machine, and present without a subscription or internet connection.
 
 ---
 
@@ -50,7 +51,7 @@ Images are embedded as base64 data URLs inside the project so slides stay fully 
 
 ## Made for explaining code beautifully
 
-Whether you are recording a tutorial, teaching a class, streaming a live build, giving a conference talk, or sharing a technical demo, OpenSlides helps you focus attention on the exact part of the code that matters.
+Whether you are recording a tutorial, teaching a class, streaming a live build, giving a conference talk, or sharing a technical demo, DevSlides helps you focus attention on the exact part of the code that matters.
 
 - Keep projects private, local, and ready to present anywhere.
 - Search across slides, use thumbnails and hover previews, and navigate by keyboard.
@@ -61,13 +62,13 @@ Whether you are recording a tutorial, teaching a class, streaming a live build, 
 
 ## How it works
 
-Create a project, add your code to slides, then select the lines you want to explain. OpenSlides turns those selections into presentation steps, so you can guide viewers through a function, refactor, algorithm, or feature at a natural pace. When it is time to present, move through slides and highlight steps with the keyboard, use full-screen mode, or let the deck advance automatically.
+Create a project, add your code to slides, then select the lines you want to explain. DevSlides turns those selections into presentation steps, so you can guide viewers through a function, refactor, algorithm, or feature at a natural pace. When it is time to present, move through slides and highlight steps with the keyboard, use full-screen mode, or let the deck advance automatically.
 
-Everything stays on your computer. That makes OpenSlides useful for private client work, offline classrooms, live events, and any workflow where you want your code and slides under your control.
+Everything stays on your computer. That makes DevSlides useful for private client work, offline classrooms, live events, and any workflow where you want your code and slides under your control.
 
 ## Download
 
-Prebuilt installers for macOS, Windows, and Linux are available from the [OpenSlides Releases](https://github.com/alyohara/OpenSlides/releases) page.
+Prebuilt installers for macOS, Windows, and Linux are available from the [DevSlides Releases](https://github.com/alyohara/DevSlides/releases) page.
 
 ### Platform packages
 
@@ -77,21 +78,21 @@ Prebuilt installers for macOS, Windows, and Linux are available from the [OpenSl
 
 ### macOS installation
 
-OpenSlides macOS builds are ad-hoc signed. That is enough for Apple Silicon packages to launch after download; a paid Apple Developer certificate is still required for full notarization later.
+DevSlides macOS builds are ad-hoc signed. That is enough for Apple Silicon packages to launch after download; a paid Apple Developer certificate is still required for full notarization later.
 
-1. Open the `.dmg` and drag **OpenSlides** into **Applications**.
+1. Open the `.dmg` and drag **DevSlides** into **Applications**.
 2. First launch: right-click the app → **Open**, then confirm.
 3. If macOS still says the app is damaged, clear the download quarantine flag:
 
 ```bash
-xattr -dr com.apple.quarantine /Applications/OpenSlides.app
+xattr -dr com.apple.quarantine /Applications/DevSlides.app
 ```
 
 Then open the app again from Applications.
 
 ### Linux installation
 
-OpenSlides release builds include Linux packages in `.deb`, `.rpm`, and AppImage formats.
+DevSlides release builds include Linux packages in `.deb`, `.rpm`, and AppImage formats.
 
 - **Debian / Ubuntu / Linux Mint / Pop!\_OS**
 
@@ -100,7 +101,7 @@ Install the required runtime libraries first, then install the package:
 ```bash
 sudo apt update
 sudo apt install -y libwebkit2gtk-4.1-0 libgtk-3-0 libscrypt0 libayatana-appindicator3-1 librsvg2-common
-sudo apt install ./OpenSlides_<version>_amd64.deb
+sudo apt install ./DevSlides_<version>_amd64.deb
 ```
 
 - **Fedora / RHEL / Rocky / AlmaLinux / other DNF-based distributions**
@@ -110,12 +111,12 @@ Install the required runtime libraries first, then install the package:
 ```bash
 sudo dnf check-update
 sudo dnf install -y webkit2gtk4.1 gtk3 libappindicator-gtk3 librsvg2
-sudo dnf install -y ./OpenSlides-<version>-1.x86_64.rpm
+sudo dnf install -y ./DevSlides-<version>-1.x86_64.rpm
 ```
 
 - **AppImage**
 
-Needs FUSE. Without it: `./OpenSlides_*.AppImage --appimage-extract-and-run`. On Wayland with rendering glitches, try `WEBKIT_DISABLE_DMABUF_RENDERER=1`. Otherwise the `.deb` / `.rpm` packages link against the system GTK stack and tend to be smoother.
+Needs FUSE. Without it: `./DevSlides_*.AppImage --appimage-extract-and-run`. On Wayland with rendering glitches, try `WEBKIT_DISABLE_DMABUF_RENDERER=1`. Otherwise the `.deb` / `.rpm` packages link against the system GTK stack and tend to be smoother.
 
 ## Tech stack
 
@@ -160,7 +161,7 @@ bun run build              # production bundle
 
 ## Credits
 
-This project is a fork of [codewiththiha/OpenSlides](https://github.com/codewiththiha/OpenSlides) by [CodeWithThiha](https://github.com/codewiththiha). The image feature and related enhancements were added by [alyohara](https://github.com/alyohara).
+DevSlides is a fork of [codewiththiha/OpenSlides](https://github.com/codewiththiha/OpenSlides) by [CodeWithThiha](https://github.com/codewiththiha). The image feature and related enhancements were added by [alyohara](https://github.com/alyohara).
 
 ## License
 

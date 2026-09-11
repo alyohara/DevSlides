@@ -223,7 +223,7 @@ test("dashboard card click opens the editor; Present enters and advances the pre
   click(presentBtn);
   flushSync();
   await waitFor(
-    () => Boolean(target.querySelector("#openslides-present-root")),
+    () => Boolean(target.querySelector("#devslides-present-root")),
     "presentation overlay",
   );
   assertNoAppErrors("present overlay");
@@ -231,7 +231,7 @@ test("dashboard card click opens the editor; Present enters and advances the pre
 
   // Stage click advances: highlight 1 reveal, then slide advance.
   const stage = target.querySelector(
-    "#openslides-present-root div[role='presentation']",
+    "#devslides-present-root div[role='presentation']",
   ) as HTMLElement;
   assert.ok(stage, "stage clickable area exists");
   click(stage); // reveal highlight p1-h1

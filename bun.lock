@@ -3,7 +3,7 @@
   "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "openslides",
+      "name": "devslides",
       "dependencies": {
         "@humanspeak/svelte-motion": "^0.8.0",
         "@lucide/svelte": "^1.25.0",

@@ -67,9 +67,9 @@ jobs:
         run: |
           set -euo pipefail
           expected=(
-            "OpenSlides_${VERSION}_amd64.deb"
-            "OpenSlides_x64.app.tar.gz"
-            "OpenSlides_aarch64.app.tar.gz"
+            "DevSlides_${VERSION}_amd64.deb"
+            "DevSlides_x64.app.tar.gz"
+            "DevSlides_aarch64.app.tar.gz"
           )
 
           asset_names() {
@@ -112,9 +112,9 @@ jobs:
           for attempt in 1 2 3; do
             gh release download "$TAG" \
               --repo "${GITHUB_REPOSITORY}" \
-              --pattern "OpenSlides_${VERSION}_amd64.deb" \
-              --pattern "OpenSlides_x64.app.tar.gz" \
-              --pattern "OpenSlides_aarch64.app.tar.gz" \
+              --pattern "DevSlides_${VERSION}_amd64.deb" \
+              --pattern "DevSlides_x64.app.tar.gz" \
+              --pattern "DevSlides_aarch64.app.tar.gz" \
               --dir "$tmpdir" || true
 
             ok=1
@@ -159,9 +159,9 @@ jobs:
             openssl dgst -sha256 -binary "$1" | base64 | tr -d '\n'
           }
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "linux=sha256-$(hash_sri "OpenSlides_${VERSION}_amd64.deb")" >> "$GITHUB_OUTPUT"
-          echo "x64-darwin=sha256-$(hash_sri "OpenSlides_x64.app.tar.gz")" >> "$GITHUB_OUTPUT"
-          echo "aarch64-darwin=sha256-$(hash_sri "OpenSlides_aarch64.app.tar.gz")" >> "$GITHUB_OUTPUT"
+          echo "linux=sha256-$(hash_sri "DevSlides_${VERSION}_amd64.deb")" >> "$GITHUB_OUTPUT"
+          echo "x64-darwin=sha256-$(hash_sri "DevSlides_x64.app.tar.gz")" >> "$GITHUB_OUTPUT"
+          echo "aarch64-darwin=sha256-$(hash_sri "DevSlides_aarch64.app.tar.gz")" >> "$GITHUB_OUTPUT"
 
       - name: Update nix/sources.json
         if: steps.tag.outputs.skip != 'true'

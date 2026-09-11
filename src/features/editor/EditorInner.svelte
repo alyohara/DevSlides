@@ -128,12 +128,12 @@
 
 {#if projQuery.isLoading}
   <div class="flex h-full flex-col">
-    <TitleBar title="OpenSlides" />
+    <TitleBar title="DevSlides" />
     <AsyncState isLoading isError={false} loadingLabel="Loading project…" />
   </div>
 {:else if projQuery.isError || !project}
   <div class="flex h-full flex-col">
-    <TitleBar title="OpenSlides" />
+    <TitleBar title="DevSlides" />
     <AsyncState
       isLoading={false}
       isError

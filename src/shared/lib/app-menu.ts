@@ -69,7 +69,7 @@ export async function installAppMenu(): Promise<void> {
     if (!isMacOS()) {
       fileItems.push(await PredefinedMenuItem.new({ item: "Separator" }));
       fileItems.push(
-        await PredefinedMenuItem.new({ item: "Quit", text: "Quit OpenSlides" }),
+        await PredefinedMenuItem.new({ item: "Quit", text: "Quit DevSlides" }),
       );
     }
 
@@ -140,7 +140,7 @@ export async function installAppMenu(): Promise<void> {
 
     if (isMacOS()) {
       const appMenu = await Submenu.new({
-        text: "OpenSlides",
+        text: "DevSlides",
         items: [
           await item("menu://shortcuts-app", "Keyboard Shortcuts"),
           await PredefinedMenuItem.new({ item: "Separator" }),
@@ -148,14 +148,14 @@ export async function installAppMenu(): Promise<void> {
           await PredefinedMenuItem.new({ item: "Separator" }),
           await PredefinedMenuItem.new({
             item: "Hide",
-            text: "Hide OpenSlides",
+            text: "Hide DevSlides",
           }),
           await PredefinedMenuItem.new({ item: "HideOthers" }),
           await PredefinedMenuItem.new({ item: "ShowAll" }),
           await PredefinedMenuItem.new({ item: "Separator" }),
           await PredefinedMenuItem.new({
             item: "Quit",
-            text: "Quit OpenSlides",
+            text: "Quit DevSlides",
           }),
         ],
       });
@@ -165,6 +165,6 @@ export async function installAppMenu(): Promise<void> {
     const menu = await Menu.new({ items: submenus });
     await menu.setAsAppMenu();
   } catch (err) {
-    console.warn("[OpenSlides] native menu unavailable:", err);
+    console.warn("[DevSlides] native menu unavailable:", err);
   }
 }

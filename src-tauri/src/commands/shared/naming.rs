@@ -203,7 +203,7 @@ pub fn sanitize_filename(name: &str) -> String {
         .collect();
     let trimmed = cleaned.trim();
     let stem = if trimmed.is_empty() {
-        "openslides-export".to_string()
+        "devslides-export".to_string()
     } else {
         trimmed.replace(' ', "-")
     };

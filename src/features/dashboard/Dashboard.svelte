@@ -33,7 +33,7 @@
 
   // Native + document window title for the dashboard route.
   $effect(() => {
-    setWindowTitle("OpenSlides — Presentations");
+    setWindowTitle("DevSlides — Presentations");
   });
 
   $effect(() => {
@@ -93,11 +93,11 @@
     {#snippet leading()}
       <div class="flex items-center gap-2">
         <img
-          src="/openslides-logo.svg"
-          alt="OpenSlides"
+          src="/devslides-logo.svg"
+          alt="DevSlides"
           class="h-8 w-8 rounded-lg object-cover"
         />
-        <span class="text-sm font-semibold">OpenSlides</span>
+        <span class="text-sm font-semibold">DevSlides</span>
       </div>
     {/snippet}
     {#snippet trailing()}

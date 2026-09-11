@@ -8,7 +8,7 @@
 </script>
 
 <svelte:boundary
-  onerror={(error) => console.error("[OpenSlides] renderer failed", error)}
+  onerror={(error) => console.error("[DevSlides] renderer failed", error)}
 >
   {@render children?.()}
 

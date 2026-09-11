@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="osTitle">
-  <title id="osTitle">OpenSlides — code presentation app icon</title>
+  <title id="osTitle">DevSlides — code presentation app icon</title>
   <defs>
     <radialGradient id="osBg" cx="30%" cy="22%" r="95%"><stop offset="0%" stop-color="#1B2233"/><stop offset="55%" stop-color="#12151F"/><stop offset="100%" stop-color="#0C0E15"/></radialGradient>
     <radialGradient id="osGlowBlue"><stop offset="0%" stop-color="#569CD6" stop-opacity="0.28"/><stop offset="100%" stop-color="#569CD6" stop-opacity="0"/></radialGradient>

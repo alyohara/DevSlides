@@ -141,7 +141,7 @@
 }
 
 /* ─── Toast system (AppToaster + notify()) — FIXED SIZE for every toast ─── */
-.toast-openslides.toast-fixed,
+.toast-devslides.toast-fixed,
 .toast-fixed {
   width: min(400px, calc(100vw - 2rem)) !important;
   min-width: min(400px, calc(100vw - 2rem)) !important;
@@ -163,7 +163,7 @@
   overflow: hidden !important;
 }
 
-.toast-openslides [data-icon],
+.toast-devslides [data-icon],
 .toast-fixed [data-icon] {
   display: none !important;
   width: 0 !important;
@@ -172,7 +172,7 @@
   padding: 0 !important;
 }
 
-.toast-openslides [data-content],
+.toast-devslides [data-content],
 .toast-fixed [data-content],
 .toast-content {
   flex: 1 1 auto !important;
@@ -186,7 +186,7 @@
   height: 100% !important;
 }
 
-.toast-openslides [data-title],
+.toast-devslides [data-title],
 .toast-fixed [data-title] {
   font-size: 0.8125rem !important;
   font-weight: 500 !important;
@@ -196,7 +196,7 @@
   text-overflow: ellipsis !important;
 }
 
-.toast-openslides [data-description],
+.toast-devslides [data-description],
 .toast-fixed [data-description],
 .toast-desc-slot {
   font-size: 0.75rem !important;
@@ -209,9 +209,9 @@
   text-overflow: ellipsis !important;
 }
 
-.toast-openslides [data-button],
-.toast-openslides button[data-button],
-.toast-openslides .toast-action,
+.toast-devslides [data-button],
+.toast-devslides button[data-button],
+.toast-devslides .toast-action,
 .toast-fixed [data-button] {
   flex: 0 0 auto !important;
   margin-left: auto !important;
@@ -237,9 +237,9 @@
   border: none !important;
 }
 
-.toast-openslides [data-close-button],
-.toast-openslides button[data-close-button],
-.toast-openslides .toast-close,
+.toast-devslides [data-close-button],
+.toast-devslides button[data-close-button],
+.toast-devslides .toast-close,
 .toast-fixed [data-close-button] {
   position: absolute !important;
   right: 0.5rem !important;
@@ -264,9 +264,9 @@
     color 0.15s ease;
 }
 
-.toast-openslides [data-close-button]:hover,
-.toast-openslides button[data-close-button]:hover,
-.toast-openslides .toast-close:hover {
+.toast-devslides [data-close-button]:hover,
+.toast-devslides button[data-close-button]:hover,
+.toast-devslides .toast-close:hover {
   opacity: 1;
   background: hsl(var(--muted)) !important;
   color: hsl(var(--foreground)) !important;
@@ -353,7 +353,7 @@
   overflow: visible !important;
 }
 
-@keyframes openslides-present-progress {
+@keyframes devslides-present-progress {
   from {
     transform: scaleX(0);
   }
@@ -362,7 +362,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .openslides-progress-anim {
+  .devslides-progress-anim {
     animation: none !important;
     transform: scaleX(1);
   }

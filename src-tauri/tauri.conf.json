@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "OpenSlides",
+  "productName": "DevSlides",
   "version": "1.3.0",
-  "identifier": "com.alyohara.openslides",
+  "identifier": "com.alyohara.devslides",
   "build": {
     "beforeDevCommand": "bun run dev",
     "devUrl": "http://localhost:1420",
@@ -14,7 +14,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "OpenSlides",
+        "title": "DevSlides",
         "width": 1400,
         "height": 900,
         "minWidth": 960,
@@ -42,7 +42,7 @@
     "publisher": "alyohara",
     "category": "Education",
     "shortDescription": "Offline-first code presentation desktop app",
-    "longDescription": "OpenSlides \u2014 a free, open-source, offline desktop app for turning code into polished slides with smooth step-by-step transitions.",
+    "longDescription": "DevSlides \u2014 a fork of OpenSlides: a free, open-source, offline desktop app for turning code into polished slides with smooth step-by-step transitions.",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

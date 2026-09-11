@@ -77,7 +77,7 @@
         >{/if}</pre>
     <textarea
       bind:this={textareaEl}
-      data-openslides-editor
+      data-devslides-editor
       oninput={(e) => onChange(e.currentTarget.value)}
       onkeydown={onKeyDown}
       onkeyup={onKeyUp}

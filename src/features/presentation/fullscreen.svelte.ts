@@ -30,7 +30,7 @@ export function createPresentFullscreen() {
   }
 
   async function tryEnterFullscreen() {
-    const el = document.getElementById("openslides-present-root");
+    const el = document.getElementById("devslides-present-root");
     try {
       if (el && el.requestFullscreen && !document.fullscreenElement) {
         await el.requestFullscreen();
@@ -70,7 +70,7 @@ export function createPresentFullscreen() {
     if (!ui.isPresenting) return;
 
     const syncFullscreenState = () => {
-      const el = document.getElementById("openslides-present-root");
+      const el = document.getElementById("devslides-present-root");
       if (!el || document.fullscreenElement) return;
       void (async () => {
         try {

@@ -9,15 +9,15 @@ let
 
   srcMap = {
     x86_64-linux = fetchurl {
-      url = "https://github.com/alyohara/OpenSlides/releases/download/v${version}/OpenSlides_${version}_amd64.deb";
+      url = "https://github.com/alyohara/DevSlides/releases/download/v${version}/DevSlides_${version}_amd64.deb";
       hash = sources.hashes.x86_64-linux;
     };
     x86_64-darwin = fetchurl {
-      url = "https://github.com/alyohara/OpenSlides/releases/download/v${version}/OpenSlides_x64.app.tar.gz";
+      url = "https://github.com/alyohara/DevSlides/releases/download/v${version}/DevSlides_x64.app.tar.gz";
       hash = sources.hashes.x86_64-darwin;
     };
     aarch64-darwin = fetchurl {
-      url = "https://github.com/alyohara/OpenSlides/releases/download/v${version}/OpenSlides_aarch64.app.tar.gz";
+      url = "https://github.com/alyohara/DevSlides/releases/download/v${version}/DevSlides_aarch64.app.tar.gz";
       hash = sources.hashes.aarch64-darwin;
     };
   };
@@ -27,10 +27,10 @@ let
 in
 
 assert lib.assertMsg (builtins.hasAttr sys srcMap)
-  "openslides: unsupported platform ${sys}";
+  "devslides: unsupported platform ${sys}";
 
 stdenv.mkDerivation {
-  pname = "openslides";
+  pname = "devslides";
   inherit version;
 
   src = srcMap.${sys};
@@ -40,7 +40,7 @@ stdenv.mkDerivation {
   ];
 
   # Match the dynamic libs the shipped Linux binary actually NEEDs
-  # (gtk/webkit stack). No GStreamer — OpenSlides has no A/V playback.
+  # (gtk/webkit stack). No GStreamer — DevSlides has no A/V playback.
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     gtk3
     gdk-pixbuf
@@ -57,7 +57,7 @@ stdenv.mkDerivation {
   installPhase = if stdenv.hostPlatform.isLinux then ''
     mkdir -p $out/bin $out/share
     cp -r usr/share/* $out/share/
-    install -Dm755 usr/bin/openslides $out/bin/openslides
+    install -Dm755 usr/bin/devslides $out/bin/devslides
   '' else ''
     mkdir -p $out/Applications
     cp -r *.app $out/Applications/
@@ -65,9 +65,9 @@ stdenv.mkDerivation {
 
   meta = with lib; {
     description = "Offline-first code presentation desktop app";
-    homepage = "https://github.com/alyohara/OpenSlides";
+    homepage = "https://github.com/alyohara/DevSlides";
     license = licenses.mit;
     platforms = [ "x86_64-linux" "x86_64-darwin" "aarch64-darwin" ];
-    mainProgram = "openslides";
+    mainProgram = "devslides";
   };
 }

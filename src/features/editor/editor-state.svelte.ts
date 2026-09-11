@@ -26,7 +26,7 @@ export function createEditorState(args: {
   const project = $derived(query.data);
   const slides = $derived(project?.slides ?? []);
   const title = $derived(
-    project ? `OpenSlides — ${project.name}` : "OpenSlides",
+    project ? `DevSlides — ${project.name}` : "DevSlides",
   );
 
   let editorExpanded = $state(false);

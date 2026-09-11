@@ -17,8 +17,8 @@
 <div class={cn("overflow-hidden", className)} {style}>
   {#key resetKey}
     <div
-      class="openslides-progress-anim h-full w-full origin-left bg-primary"
-      style="animation: openslides-present-progress {duration}ms linear forwards;"
+      class="devslides-progress-anim h-full w-full origin-left bg-primary"
+      style="animation: devslides-present-progress {duration}ms linear forwards;"
     ></div>
   {/key}
 </div>

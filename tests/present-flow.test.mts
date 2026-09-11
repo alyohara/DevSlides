@@ -237,18 +237,18 @@ test("toolbar Present button mounts the presentation overlay and stage clicks st
 
   assert.equal(ui.isPresenting, true, "ui.isPresenting after Present click");
   await waitFor(
-    () => Boolean(target.querySelector("#openslides-present-root")),
+    () => Boolean(target.querySelector("#devslides-present-root")),
     "presentation overlay root",
   );
   assertNoAppErrors("present overlay mount");
   assert.ok(
-    target.querySelector("#openslides-present-root"),
+    target.querySelector("#devslides-present-root"),
     "overlay rendered",
   );
 
   // Stage = the full-bleed click target inside the overlay root.
   const stage = target.querySelector(
-    "#openslides-present-root div[role='presentation']",
+    "#devslides-present-root div[role='presentation']",
   ) as HTMLElement;
   assert.ok(stage, "stage click target exists");
 
@@ -317,7 +317,7 @@ test("direct enterPresent (menu://present path) renders overlay; ESC control exi
   setIsPresenting(true);
   flushSync();
   await waitFor(
-    () => Boolean(target.querySelector("#openslides-present-root")),
+    () => Boolean(target.querySelector("#devslides-present-root")),
     "presentation overlay root",
   );
   assertNoAppErrors("menu-path present");
@@ -416,7 +416,7 @@ test("present: forward then BACKWARD through highlights (ArrowLeft) — no rende
   click(presentBtn);
   flushSync();
   await waitFor(
-    () => Boolean(target.querySelector("#openslides-present-root")),
+    () => Boolean(target.querySelector("#devslides-present-root")),
     "presentation overlay root",
   );
 
@@ -561,7 +561,7 @@ test("present: slide morph waits for restored originals (custom dim > size)", as
   click(presentBtn);
   flushSync();
   await waitFor(
-    () => Boolean(target.querySelector("#openslides-present-root")),
+    () => Boolean(target.querySelector("#devslides-present-root")),
     "presentation overlay root",
   );
 

@@ -45,7 +45,7 @@
 </script>
 
 <div
-  id="openslides-present-root"
+  id="devslides-present-root"
   class="fixed inset-0 flex items-center justify-center bg-black"
   style="z-index: {Z_INDEX.presentation}"
 >

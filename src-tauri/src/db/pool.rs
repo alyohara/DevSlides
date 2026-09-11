@@ -21,7 +21,7 @@ pub async fn init_db(app: &AppHandle) -> Result<SqlitePool, String> {
     std::fs::create_dir_all(&app_dir)
         .map_err(|e| format!("Failed to create app data dir: {e}"))?;
 
-    let db_path = app_dir.join("openslides.db");
+    let db_path = app_dir.join("devslides.db");
 
     // WAL + relaxed sync so the debounced auto-save never blocks reads
     // (scrolling/animation) on the full-DB write lock; busy_timeout avoids

@@ -49,7 +49,7 @@ pub async fn pick_image_file(app: AppHandle) -> CommandResult<String> {
             .map_err(|e| CommandError::Failed(format!("Failed to read image: {e}")))?;
         if meta.len() > MAX_IMAGE_BYTES {
             return Err(CommandError::Validation(
-                "That image is larger than 12 MB — OpenSlides keeps images embedded in the project, so try a smaller file.".to_string(),
+                "That image is larger than 12 MB — DevSlides keeps images embedded in the project, so try a smaller file.".to_string(),
             ));
         }
         std::fs::read(&read_path)

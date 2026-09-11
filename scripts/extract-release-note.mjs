@@ -47,7 +47,7 @@ if (process.env.GITHUB_OUTPUT) {
   fs.appendFileSync(process.env.GITHUB_OUTPUT, `version=${payload.version}\n`);
   fs.appendFileSync(
     process.env.GITHUB_OUTPUT,
-    `payloadJson<<OPENSLIDES_PAYLOAD\n${JSON.stringify(payload)}\nOPENSLIDES_PAYLOAD\n`,
+    `payloadJson<<DEVSLIDES_PAYLOAD\n${JSON.stringify(payload)}\nDEVSLIDES_PAYLOAD\n`,
   );
 }
 

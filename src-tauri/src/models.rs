@@ -1,4 +1,4 @@
-//! Shared data models for OpenSlides (Rust ↔ frontend JSON).
+//! Shared data models for DevSlides (Rust ↔ frontend JSON).
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value as JsonValue;

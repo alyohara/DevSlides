@@ -1,7 +1,7 @@
 import { toast } from "svelte-sonner";
 const DUR = { default: 4000, success: 3200, error: 5200 } as const;
 const SHELL =
-  "group toast-openslides toast-fixed relative flex items-center gap-3 rounded-xl border bg-card text-card-foreground shadow-lg";
+  "group toast-devslides toast-fixed relative flex items-center gap-3 rounded-xl border bg-card text-card-foreground shadow-lg";
 type Opts = {
   description?: string;
   duration?: number;

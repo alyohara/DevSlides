@@ -5,10 +5,10 @@
  */
 
 const APP_EVENTS = {
-  openSearch: "openslides:open-search",
-  findInCode: "openslides:find-in-code",
-  undo: "openslides:undo",
-  redo: "openslides:redo",
+  openSearch: "devslides:open-search",
+  findInCode: "devslides:find-in-code",
+  undo: "devslides:undo",
+  redo: "devslides:redo",
 } as const;
 
 export function emitOpenSearch(): void {

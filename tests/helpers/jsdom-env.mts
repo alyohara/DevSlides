@@ -120,7 +120,7 @@ g.cancelAnimationFrame = clearTimeout;
 // Read by src/lib/shiki-worker-client.ts (inline getHighlighter fallback) and
 // src/hooks/useShikiDisplayState.svelte.ts (zero debounce) so the jsdom
 // suites get synchronous, deterministic highlighting without a Worker.
-g.__OPENSLIDES_TEST_ENV__ = true;
+g.__DEVSLIDES_TEST_ENV__ = true;
 
 // jsdom omits some IE-era DOM APIs that older frontend runtimes feature-probe.
 g.attachEvent = () => {};

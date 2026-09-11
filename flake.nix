@@ -1,5 +1,5 @@
 {
-  description = "OpenSlides — offline-first code presentation desktop app";
+  description = "DevSlides — offline-first code presentation desktop app (a fork of OpenSlides)";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
@@ -9,16 +9,16 @@
     packages = forAllSystems (system: let
       pkgs = nixpkgs.legacyPackages.${system};
     in {
-      openslides = pkgs.callPackage ./nix/package.nix { };
-      default = self.packages.${system}.openslides;
+      devslides = pkgs.callPackage ./nix/package.nix { };
+      default = self.packages.${system}.devslides;
     });
 
-    nixosModules.openslides = { pkgs, ... }: {
-      environment.systemPackages = [ self.packages.${pkgs.system}.openslides ];
+    nixosModules.devslides = { pkgs, ... }: {
+      environment.systemPackages = [ self.packages.${pkgs.system}.devslides ];
     };
 
-    darwinModules.openslides = { pkgs, ... }: {
-      environment.systemPackages = [ self.packages.${pkgs.system}.openslides ];
+    darwinModules.devslides = { pkgs, ... }: {
+      environment.systemPackages = [ self.packages.${pkgs.system}.devslides ];
     };
   };
 }
