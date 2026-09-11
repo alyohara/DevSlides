@@ -38,7 +38,13 @@ Add images directly to your slides:
 
 Images are embedded as base64 data URLs inside the project so slides stay fully portable — export, import, and share without worrying about external assets.
 
-![add image demo](https://www.image2url.com/r2/default/images/1789139551529-19d70350-5be8-4aa4-9cde-56cb064ab5fb.gif)
+<p align="center">
+  <img
+    src="https://www.image2url.com/r2/default/images/1789139551529-19d70350-5be8-4aa4-9cde-56cb064ab5fb.gif"
+    alt="add image demo"
+    width="720"
+  />
+</p>
 
 ---
 
