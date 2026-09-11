@@ -22,7 +22,7 @@ interface SlideLike {
 export function effectiveSlideImages(
   slide: SlideLike | undefined,
 ): SlideImage[] {
-  return slide ? (localImages[slide.id] ?? slide.images) : [];
+  return slide ? (localImages[slide.id] ?? slide.images ?? []) : [];
 }
 
 export function setLocalImages(id: string, images: SlideImage[]) {
