@@ -4,6 +4,7 @@
     Minimize2,
     PanelRightClose,
     Highlighter as HighlighterIcon,
+    Image as ImageIcon,
     Search,
   } from "@lucide/svelte";
   import Button from "$lib/ui/Button.svelte";
@@ -11,6 +12,12 @@
   import EditorSlideNav from "./EditorSlideNav.svelte";
   import { cn } from "$lib/lib/utils";
   import { supportedLanguageOptions } from "$lib/lib/backend-config.svelte";
+  import { effectiveSlideImages } from "$lib/stores/slide-images.svelte";
+  import {
+    imageEditorState,
+    openImageEditor,
+    closeImageEditor,
+  } from "@/features/images/image-editor-state.svelte";
   import type { Project } from "$lib/types";
 
   let {
@@ -42,6 +49,9 @@
   } = $props();
 
   const languageOptions = $derived(supportedLanguageOptions());
+  const imageCount = $derived(
+    effectiveSlideImages(project.slides[currentIndex]).length,
+  );
 </script>
 
 <div
@@ -80,6 +90,32 @@
           class="absolute -top-0.5 -right-0.5 flex h-3 min-w-3 items-center justify-center rounded-full bg-primary px-0.5 text-[8px] leading-none font-semibold text-primary-foreground"
         >
           {highlightCount}
+        </span>
+      {/if}
+    </Button>
+
+    <Button
+      variant="ghost"
+      size="icon"
+      class={cn(
+        "relative h-7 w-7 shrink-0",
+        imageEditorState.open && "bg-primary/15 text-primary",
+      )}
+      onclick={() => {
+        if (imageEditorState.open) {
+          closeImageEditor();
+        } else {
+          openImageEditor();
+        }
+      }}
+      title="Slide images — pick a file or paste from your clipboard"
+    >
+      <ImageIcon class="h-3.5 w-3.5" />
+      {#if imageCount > 0}
+        <span
+          class="absolute -top-0.5 -right-0.5 flex h-3 min-w-3 items-center justify-center rounded-full bg-primary px-0.5 text-[8px] leading-none font-semibold text-primary-foreground"
+        >
+          {imageCount}
         </span>
       {/if}
     </Button>

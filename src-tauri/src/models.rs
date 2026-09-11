@@ -43,6 +43,41 @@ pub struct Highlight {
     pub size_up_transition: i64,
 }
 
+/// An image layer attached to a slide.
+///
+/// - `role = "background"` tiles the whole stage behind the code block.
+/// - `role = "element"` is a freely positionable/resizable layer rendered on
+///   top of the code block (compositor-style editing).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SlideImage {
+    pub id: String,
+    /// Embedded data URL (`data:<mime>;base64,...`) so slides stay portable
+    /// across export/import without external asset files.
+    pub src: String,
+    /// `"background"` | `"element"`
+    #[serde(default = "default_image_role")]
+    pub role: String,
+    /// Element top-left position as % of stage width (0-100).
+    #[serde(default)]
+    pub x: f64,
+    /// Element top-left position as % of stage height (0-100).
+    #[serde(default)]
+    pub y: f64,
+    /// Element width as % of stage; `None` → auto-ratio from the image.
+    #[serde(default)]
+    pub width: Option<f64>,
+    /// Element height as % of stage; `None` → auto-ratio from the image.
+    #[serde(default)]
+    pub height: Option<f64>,
+    /// Stack order among element layers.
+    #[serde(default = "default_image_z_index")]
+    pub z_index: i64,
+    /// Opacity 0-100.
+    #[serde(default = "default_image_opacity")]
+    pub opacity: i64,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Slide {
@@ -69,6 +104,9 @@ pub struct Slide {
     /// Section/group ID if this slide is part of a slide stack.
     #[serde(default)]
     pub section_id: Option<String>,
+    /// Image layers attached to this slide (background fill + positioned elements).
+    #[serde(default)]
+    pub images: Vec<SlideImage>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -159,6 +197,7 @@ pub struct UpdateSlideSettingsPayload {
     pub stagger: Option<i64>,
     pub name: Option<String>,
     pub highlights: Option<Vec<Highlight>>,
+    pub images: Option<Vec<SlideImage>>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -235,6 +274,8 @@ pub struct ImportSlidePayload {
     pub name: String,
     #[serde(default)]
     pub section_id: Option<String>,
+    #[serde(default)]
+    pub images: Vec<SlideImage>,
 }
 
 pub(crate) fn default_dim_amount() -> i64 {
@@ -305,6 +346,15 @@ pub(crate) fn default_slide_transition() -> i64 {
 }
 pub(crate) fn default_slide_stagger() -> i64 {
     DEFAULT_SLIDE_STAGGER
+}
+pub(crate) fn default_image_role() -> String {
+    "element".into()
+}
+pub(crate) fn default_image_z_index() -> i64 {
+    10
+}
+pub(crate) fn default_image_opacity() -> i64 {
+    100
 }
 
 impl Default for ProjectSettings {

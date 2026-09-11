@@ -9,6 +9,22 @@ pub enum DialogMode {
     Open,
 }
 
+/// Await an open file dialog restricted to raster image types.
+pub fn dialog_pick_image_path(app: &AppHandle) -> Option<std::path::PathBuf> {
+    let (tx, rx) = mpsc::channel();
+    let builder = app
+        .dialog()
+        .file()
+        .add_filter("Images", &["png", "jpg", "jpeg", "gif", "webp", "bmp", "avif"]);
+    builder.pick_file(move |path| {
+        let _ = tx.send(path);
+    });
+    rx.recv()
+        .ok()
+        .flatten()
+        .and_then(|fp| fp.into_path().ok())
+}
+
 /// Await a callback-based dialog on a worker-friendly channel.
 pub fn dialog_pick_path(
     app: &AppHandle,

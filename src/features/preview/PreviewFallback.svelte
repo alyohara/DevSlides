@@ -1,6 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib/lib/utils";
   import { fallbackForeground } from "$lib/types";
+  import type { Snippet } from "svelte";
 
   let {
     isMerustmarFail,
@@ -12,6 +13,7 @@
     centerBlock,
     bg,
     ref = $bindable(null),
+    children,
   }: {
     isMerustmarFail: boolean;
     theme: string;
@@ -22,6 +24,7 @@
     centerBlock: boolean;
     bg: string;
     ref?: HTMLDivElement | null;
+    children?: Snippet;
   } = $props();
 </script>
 
@@ -49,6 +52,7 @@
           theme,
         )}; white-space: pre;">{code}</pre>
     </div>
+    {@render children?.()}
   </div>
 {:else}
   <div

@@ -55,6 +55,48 @@ export interface Slide {
   thumbnailHtml?: string;
   /** Section/group ID if this slide is part of a slide stack. */
   sectionId?: string | null;
+  /** Image layers attached to this slide (background fill + positioned elements). */
+  images: SlideImage[];
+}
+
+export type SlideImageRole = "background" | "element";
+
+export interface SlideImage {
+  id: string;
+  /** Embedded data URL (`data:<mime>;base64,...`) so slides stay portable. */
+  src: string;
+  /** background = tiles the whole stage behind the code block;
+      element = freely positionable/resizable layer above the code. */
+  role: SlideImageRole;
+  /** Top-left x as % of stage width (0-100). Element layers only. */
+  x: number;
+  /** Top-left y as % of stage height (0-100). Element layers only. */
+  y: number;
+  /** Width as % of stage; null → auto-ratio from the image. */
+  width: number | null;
+  /** Height as % of stage; null → auto-ratio from the image. */
+  height: number | null;
+  /** Stack order among element layers. */
+  zIndex: number;
+  /** Opacity 0-100. */
+  opacity: number;
+}
+
+export function createSlideImage(
+  src: string,
+  role: SlideImageRole = "element",
+): SlideImage {
+  return {
+    id: crypto.randomUUID(),
+    src,
+    role,
+    x: 25,
+    y: 15,
+    width: 50,
+    height: null,
+    zIndex: 10,
+    opacity: 100,
+  };
 }
 
 export interface ProjectSettings {

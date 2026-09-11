@@ -52,6 +52,8 @@ pub fn run() {
             unstack_slides,
             export_project_to_json,
             import_project_from_json,
+            pick_image_file,
+            read_clipboard_image,
             search_slides,
             finish_quit,
         ])

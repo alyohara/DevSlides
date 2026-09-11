@@ -9,6 +9,7 @@ import type {
   ProjectSummary,
   ProjectSettings,
   Slide,
+  SlideImage,
 } from "$lib/types";
 import type { LanguageOption } from "$lib/lib/language-meta";
 import type { ThemeMeta } from "$lib/lib/theme-meta";
@@ -19,6 +20,7 @@ export type SlideSettingsPatch = Partial<{
   stagger: number;
   name: string;
   highlights: Highlight[];
+  images: SlideImage[];
 }>;
 
 export type SettingsPatch = Partial<ProjectSettings>;
@@ -142,6 +144,12 @@ export const api = {
     call<string>("export_project_to_json", { projectId }),
 
   importProjectFromJson: () => call<Project>("import_project_from_json"),
+
+  /** Pick an image from a native dialog; returns an embedded data URL. */
+  pickImageFile: () => call<string>("pick_image_file"),
+
+  /** Read an image from the system clipboard (if any) as a PNG data URL. */
+  readClipboardImage: () => call<string | null>("read_clipboard_image"),
 
   searchSlides: (projectId: string, query: string) =>
     call<string[]>("search_slides", { projectId, query }),

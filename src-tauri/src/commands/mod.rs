@@ -5,6 +5,7 @@
 
 pub mod helpers;
 pub mod shared;
+mod images;
 mod io;
 mod projects;
 mod quit;
@@ -12,6 +13,7 @@ mod search;
 mod slides;
 mod stacks;
 
+pub use images::*;
 pub use io::*;
 pub use projects::*;
 pub use quit::*;

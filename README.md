@@ -1,5 +1,7 @@
 # OpenSlides
 
+> **Fork by [alyohara](https://github.com/alyohara)** — based on [codewiththiha/OpenSlides](https://github.com/codewiththiha/OpenSlides).
+
 **Beautiful code presentations for content creators, educators, and developers.**
 
 OpenSlides is a free, open-source, offline desktop app for turning code into polished slides with smooth, step-by-step transitions. It is a direct alternative to [codeslides.app](https://codeslides.app): create expressive code decks, keep your work on your own machine, and present without a subscription or internet connection.
@@ -24,6 +26,18 @@ Reveal an idea line by line with stepped highlights. Control emphasis per step: 
 
 Choose light or dark presentation themes to match your style and recording setup.
 
+### Images (new in this fork)
+
+Add images directly to your slides:
+
+- **Background images** — fill the entire stage behind the code.
+- **Element images** — freely position, resize, and stack layers on top of the code.
+- **Image-only slides** — create slides with just an image (no code).
+- **Paste from clipboard** — Ctrl/Cmd+V an image straight into a slide.
+- **Native file picker** — choose any PNG, JPEG, GIF, WebP, BMP or AVIF file.
+
+Images are embedded as base64 data URLs inside the project so slides stay fully portable — export, import, and share without worrying about external assets.
+
 ---
 
 ## Made for explaining code beautifully
@@ -35,6 +49,7 @@ Whether you are recording a tutorial, teaching a class, streaming a live build, 
 - Present in full screen with optional autoplay and per-slide timing.
 - Create, organize, rename, duplicate, import, and export slide projects.
 - Arrange slides in stacks and reorder them with drag and drop.
+- Add and arrange images on any slide.
 
 ## How it works
 
@@ -44,14 +59,13 @@ Everything stays on your computer. That makes OpenSlides useful for private clie
 
 ## Download
 
-Prebuilt installers for macOS, Windows, and Linux are available from the [OpenSlides Releases](https://github.com/codewiththiha/OpenSlides/releases) page.
+Prebuilt installers for macOS, Windows, and Linux are available from the [OpenSlides Releases](https://github.com/alyohara/OpenSlides/releases) page.
 
 ### Platform packages
 
 - **macOS:** separate Apple Silicon (`aarch64`) and Intel (`x64`) builds
 - **Windows:** x64 and ARM64 builds
 - **Linux:** `.deb`, `.rpm`, and AppImage
-- **Nix:** flake package for `x86_64-linux`, `x86_64-darwin`, and `aarch64-darwin`
 
 ### macOS installation
 
@@ -95,16 +109,6 @@ sudo dnf install -y ./OpenSlides-<version>-1.x86_64.rpm
 
 Needs FUSE. Without it: `./OpenSlides_*.AppImage --appimage-extract-and-run`. On Wayland with rendering glitches, try `WEBKIT_DISABLE_DMABUF_RENDERER=1`. Otherwise the `.deb` / `.rpm` packages link against the system GTK stack and tend to be smoother.
 
-- **NixOS / Nix**
-
-```bash
-nix profile install github:codewiththiha/OpenSlides
-```
-
-On NixOS you can also import the flake and add `inputs.openslides.packages.${pkgs.system}.openslides` to `environment.systemPackages`, or use the `nixosModules.openslides` output. After each published release, `nix/sources.json` is refreshed automatically so the flake points at the matching installer hashes.
-
-If your distribution prefers a different workflow, read the package manager guidance in your distro docs first.
-
 ## Tech stack
 
 - **Desktop app:** Tauri 2 and Rust
@@ -114,6 +118,7 @@ If your distribution prefers a different workflow, read the package manager guid
 - **Motion and DnD:** Svelte transitions/springs, svelte-dnd-action, and custom pointer drag-and-drop
 - **Code rendering:** Shiki and shiki-magic-move
 - **Local storage:** SQLite (via sqlx, Rust side)
+- **Image handling:** arboard (clipboard), png/base64 encoding, native file dialog
 
 ## Run from source
 
@@ -142,12 +147,12 @@ The same gates CI enforces on every push and pull request:
 bun run check              # svelte-check: 0 errors, 0 warnings
 bun run lint               # eslint
 bun run format:check       # prettier (svelte + tailwind plugins)
-bun run test:highlight     # highlight token pipeline (11 tests)
-bun run test:save-race     # editor save/debounce races (14 tests)
-bun run test:app-flow      # real app flows in jsdom: dashboard -> editor -> present (9 tests)
-bun run test:stack-targeting  # slide stack drop-zone geometry (4 tests)
 bun run build              # production bundle
 ```
+
+## Credits
+
+This project is a fork of [codewiththiha/OpenSlides](https://github.com/codewiththiha/OpenSlides) by [CodeWithThiha](https://github.com/codewiththiha). The image feature and related enhancements were added by [alyohara](https://github.com/alyohara).
 
 ## License
 

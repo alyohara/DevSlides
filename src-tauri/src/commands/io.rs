@@ -3,7 +3,7 @@
 use crate::commands::helpers::{
     default_slide_name, dialog_pick_path, fetch_project, is_supported_theme, now_ms,
     normalize_code_align, normalize_imported_highlights, normalize_language, remap_section_id,
-    sanitize_filename, DialogMode, DEFAULT_THEME,
+    sanitize_filename, serialize_images, DialogMode, DEFAULT_THEME,
 };
 use crate::db::DbPool;
 use crate::error::{CommandError, CommandResult};
@@ -24,6 +24,7 @@ struct ParsedImportSlide {
     name: String,
     highlights_json: String,
     section_id: Option<String>,
+    images_json: String,
 }
 
 #[tauri::command]
@@ -69,6 +70,7 @@ pub async fn export_project_to_json(
             "name": s.name,
             "highlights": s.highlights,
             "sectionId": s.section_id,
+            "images": s.images,
         })).collect::<Vec<_>>(),
     });
 
@@ -213,6 +215,7 @@ pub async fn import_project_from_json(
         };
         let highlights_json = normalize_imported_highlights(slide_value)
             .map_err(CommandError::Failed)?;
+        let images_json = serialize_images(&slide.images).map_err(CommandError::Failed)?;
         if i == 0 {
             settings.current_slide_id = Some(id.clone());
         }
@@ -226,6 +229,7 @@ pub async fn import_project_from_json(
             name: sname,
             highlights_json,
             section_id,
+            images_json,
         });
     }
 
@@ -264,8 +268,8 @@ pub async fn import_project_from_json(
         sqlx::query(
             r#"
             INSERT INTO slides
-              (id, project_id, order_index, code, transition_duration, stagger, duration, name, highlights, section_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              (id, project_id, order_index, code, transition_duration, stagger, duration, name, highlights, section_id, images)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             "#,
         )
         .bind(&slide.id)
@@ -278,6 +282,7 @@ pub async fn import_project_from_json(
         .bind(&slide.name)
         .bind(&slide.highlights_json)
         .bind(&slide.section_id)
+        .bind(&slide.images_json)
         .execute(&mut *tx)
         .await
         .map_err(|e| CommandError::Failed(format!("Failed to insert slide: {e}")))?;

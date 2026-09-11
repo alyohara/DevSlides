@@ -7,4 +7,5 @@ pub use super::shared::project_queries::*;
 pub use super::shared::slide_queries::*;
 pub use crate::services::duplication::*;
 pub use crate::services::highlights::*;
+pub use crate::services::images::*;
 pub use crate::services::import::*;

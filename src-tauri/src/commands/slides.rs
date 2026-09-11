@@ -2,7 +2,8 @@
 
 use crate::commands::helpers::{
     batch_reindex, default_slide_name, fetch_project, insert_slide_row, load_settings, parse_highlights,
-    normalize_copied_slide_highlights, save_settings, serialize_highlights, touch_project, NewSlide,
+    normalize_copied_slide_highlights, save_settings, serialize_highlights, touch_project,
+    parse_images, serialize_images, NewSlide,
 };
 use crate::db::DbPool;
 use crate::error::{CommandError, CommandResult};
@@ -61,6 +62,7 @@ pub async fn create_slide(
             highlights_json: "[]",
             thumbnail_html: "",
             section_id: None,
+            images_json: "[]",
         },
     )
     .await?;
@@ -84,6 +86,7 @@ pub async fn create_slide(
         highlights: vec![],
         thumbnail_html: String::new(),
         section_id: None,
+        images: vec![],
     })
 }
 
@@ -103,7 +106,7 @@ pub async fn duplicate_slide(
 
     let orig = sqlx::query(
         r#"
-        SELECT id, code, transition_duration, stagger, duration, order_index, name, highlights, thumbnail_html, section_id
+        SELECT id, code, transition_duration, stagger, duration, order_index, name, highlights, thumbnail_html, section_id, images
         FROM slides WHERE id = ? AND project_id = ?
         "#,
     )
@@ -124,6 +127,7 @@ pub async fn duplicate_slide(
     let duplicate_highlights = normalize_copied_slide_highlights(&orig_highlights)?;
     let orig_thumbnail: String = orig.try_get("thumbnail_html").unwrap_or_default();
     let orig_section: Option<String> = orig.try_get("section_id").unwrap_or(None);
+    let orig_images: String = orig.try_get("images").unwrap_or_else(|_| "[]".to_string());
 
     let new_order = orig_order + 1;
     let new_id = Uuid::new_v4().to_string();
@@ -159,6 +163,7 @@ pub async fn duplicate_slide(
             highlights_json: &duplicate_highlights,
             thumbnail_html: &orig_thumbnail,
             section_id: orig_section.as_deref(),
+            images_json: &orig_images,
         },
     )
     .await?;
@@ -285,6 +290,7 @@ pub async fn restore_slide(
     };
 
     let highlights_json = serialize_highlights(&slide.highlights)?;
+    let images_json = serialize_images(&slide.images)?;
 
     insert_slide_row(
         &mut *tx,
@@ -300,6 +306,7 @@ pub async fn restore_slide(
             highlights_json: &highlights_json,
             thumbnail_html: "",
             section_id: slide.section_id.as_deref(),
+            images_json: &images_json,
         },
     )
     .await?;
@@ -368,7 +375,7 @@ pub async fn update_slide_settings(
 ) -> CommandResult<Slide> {
     let row = sqlx::query(
         r#"
-        SELECT id, project_id, code, duration, transition_duration, stagger, order_index, name, highlights, thumbnail_html, section_id
+        SELECT id, project_id, code, duration, transition_duration, stagger, order_index, name, highlights, thumbnail_html, section_id, images
         FROM slides WHERE id = ?
         "#,
     )
@@ -399,10 +406,16 @@ pub async fn update_slide_settings(
     let highlights = payload.highlights.unwrap_or(existing_highlights);
     let highlights_json = serialize_highlights(&highlights)?;
 
+    // Parse existing images or use payload
+    let images_raw: String = row.try_get("images").unwrap_or_else(|_| "[]".to_string());
+    let existing_images = parse_images(&images_raw);
+    let images = payload.images.unwrap_or(existing_images);
+    let images_json = serialize_images(&images)?;
+
     sqlx::query(
         r#"
         UPDATE slides
-        SET duration = ?, transition_duration = ?, stagger = ?, name = ?, highlights = ?
+        SET duration = ?, transition_duration = ?, stagger = ?, name = ?, highlights = ?, images = ?
         WHERE id = ?
         "#,
     )
@@ -411,6 +424,7 @@ pub async fn update_slide_settings(
     .bind(stagger)
     .bind(&name)
     .bind(&highlights_json)
+    .bind(&images_json)
     .bind(&slide_id)
     .execute(pool.inner())
     .await
@@ -433,6 +447,7 @@ pub async fn update_slide_settings(
         highlights,
         thumbnail_html,
         section_id,
+        images,
     })
 }
 

@@ -153,6 +153,18 @@
     cardActions.openContextMenu(e, slide, title);
   }}
 >
+  {#each slide.images ?? [] as img}
+    {#if img.role === "background"}
+      <img
+        src={img.src}
+        alt=""
+        draggable={false}
+        class="pointer-events-none absolute inset-0 h-full w-full rounded-none object-cover"
+        style:opacity={Math.max(0, Math.min(100, img.opacity)) / 100}
+      />
+    {/if}
+  {/each}
+
   <CodeThumbnail
     bind:ref={thumbnail.el}
     html={thumbnail.html}

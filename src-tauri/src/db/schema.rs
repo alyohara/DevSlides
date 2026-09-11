@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS slides (
     highlights TEXT NOT NULL DEFAULT '[]',
     thumbnail_html TEXT NOT NULL DEFAULT '',
     section_id TEXT DEFAULT NULL,
+    images TEXT NOT NULL DEFAULT '[]',
     FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
 );
 

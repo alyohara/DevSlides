@@ -3,6 +3,7 @@
 use crate::db::DbPool;
 use crate::models::Slide;
 use crate::services::highlights::parse_highlights;
+use crate::services::images::parse_images;
 use sqlx::{Executor, Row, Sqlite};
 
 pub async fn fetch_slides(
@@ -12,7 +13,7 @@ pub async fn fetch_slides(
 ) -> Result<Vec<Slide>, String> {
     let rows = sqlx::query(
         r#"
-        SELECT id, code, duration, transition_duration, stagger, order_index, name, highlights, thumbnail_html, section_id
+        SELECT id, code, duration, transition_duration, stagger, order_index, name, highlights, thumbnail_html, section_id, images
         FROM slides
         WHERE project_id = ?
         ORDER BY order_index ASC
@@ -28,6 +29,8 @@ pub async fn fetch_slides(
         .map(|r| {
             let highlights_raw: String = r.try_get("highlights").unwrap_or_else(|_| "[]".to_string());
             let highlights = parse_highlights(&highlights_raw);
+            let images_raw: String = r.try_get("images").unwrap_or_else(|_| "[]".to_string());
+            let images = parse_images(&images_raw);
             Slide {
                 id: r.get("id"),
                 code: r.get("code"),
@@ -40,6 +43,7 @@ pub async fn fetch_slides(
                 highlights,
                 thumbnail_html: r.try_get("thumbnail_html").unwrap_or_default(),
                 section_id: r.try_get::<Option<String>, _>("section_id").unwrap_or(None),
+                images,
             }
         })
         .collect())
@@ -72,6 +76,7 @@ pub struct NewSlide<'a> {
     pub highlights_json: &'a str,
     pub thumbnail_html: &'a str,
     pub section_id: Option<&'a str>,
+    pub images_json: &'a str,
 }
 
 pub async fn insert_slide_row<'c, E>(exec: E, slide: &NewSlide<'_>) -> Result<(), String>
@@ -80,8 +85,8 @@ where
 {
     sqlx::query(
         r#"INSERT INTO slides
-           (id, project_id, order_index, code, transition_duration, stagger, duration, name, highlights, thumbnail_html, section_id)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#,
+           (id, project_id, order_index, code, transition_duration, stagger, duration, name, highlights, thumbnail_html, section_id, images)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#,
     )
     .bind(slide.id)
     .bind(slide.project_id)
@@ -94,6 +99,7 @@ where
     .bind(slide.highlights_json)
     .bind(slide.thumbnail_html)
     .bind(slide.section_id)
+    .bind(slide.images_json)
     .execute(exec)
     .await
     .map_err(|e| format!("Failed to insert slide: {e}"))?;

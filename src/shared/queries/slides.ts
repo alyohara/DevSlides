@@ -8,8 +8,12 @@ import {
   setCurrentSlideId,
 } from "$lib/stores/ui-state.svelte";
 import { getLocalCode } from "$lib/stores/slide-code.svelte";
+import {
+  clearLocalImages,
+  getLocalImages,
+} from "$lib/stores/slide-images.svelte";
 import { showUndoToast } from "$lib/lib/settings-undo";
-import type { Project, Slide } from "$lib/types";
+import type { Project, Slide, SlideImage } from "$lib/types";
 import { projectKeys } from "./keys";
 import { queryClient } from "./query-client";
 import { projectListMutation, slideMutation } from "./mutation-policy";
@@ -199,6 +203,65 @@ export function updateSlideSettingsMutation(projectId: string) {
       },
       onError: (err: Error) =>
         notify.error(`Slide settings failed: ${err.message}`),
+    },
+  );
+}
+
+/**
+ * Image-layer mutation for the editor's live canvas. Kept intentionally
+ * quiet (no undo toast): dragging/resizing fires many cheap updates and an
+ * undo snapshot per frame would be noise, not value.
+ */
+/** Deep-compare two image lists (JSON-column values are small arrays). */
+function sameImages(a: SlideImage[], b: SlideImage[]): boolean {
+  if (a.length !== b.length) return false;
+  return a.every((x, i) => {
+    const y = b[i];
+    return (
+      y !== undefined &&
+      x.id === y.id &&
+      x.src === y.src &&
+      x.role === y.role &&
+      x.x === y.x &&
+      x.y === y.y &&
+      x.width === y.width &&
+      x.height === y.height &&
+      x.zIndex === y.zIndex &&
+      x.opacity === y.opacity
+    );
+  });
+}
+
+export function updateSlideImagesMutation(projectId: string) {
+  return slideMutation(
+    projectId,
+    ({ slideId, images }: { slideId: string; images: SlideImage[] }) =>
+      api.updateSlideSettings(slideId, { images }),
+    {
+      onSuccess: (slide: Slide, { slideId, images }) => {
+        // Only drop the shadow if it still matches what we just committed —
+        // newer in-flight edits must keep their local override untouched.
+        const shadow = getLocalImages(slideId);
+        if (shadow === undefined || sameImages(shadow, images)) {
+          clearLocalImages(slideId);
+        }
+        queryClient.setQueryData<Project>(
+          projectKeys.detail(projectId),
+          (old) => {
+            if (!old) return old;
+            return {
+              ...old,
+              slides: old.slides.map((s) =>
+                s.id === slide.id
+                  ? mergeSlidePreservingEditorCode(s, slide)
+                  : s,
+              ),
+            };
+          },
+        );
+      },
+      onError: (err: Error) =>
+        notify.error(`Image update failed: ${err.message}`),
     },
   );
 }

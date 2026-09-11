@@ -23,9 +23,13 @@
     DEFAULT_GLOBAL_SIZE_UP_AMOUNT,
   } from "$lib/constants";
   import HighlightLayer from "@/features/highlights/HighlightLayer.svelte";
+  import SlideImageLayers from "@/features/images/SlideImageLayers.svelte";
   import MagicMoveBlock from "./MagicMoveBlock.svelte";
   import PreviewFallback from "./PreviewFallback.svelte";
   import PreviewStage from "./PreviewStage.svelte";
+  import { effectiveSlideImages } from "$lib/stores/slide-images.svelte";
+  import { imageEditorState } from "@/features/images/image-editor-state.svelte";
+  import type { SlideImage } from "$lib/types";
 
   let {
     project,
@@ -33,6 +37,9 @@
     isPresenting = false,
     activeHighlightIndex = -1,
     onHighlightExitComplete,
+    allowImageEditing = false,
+    onImagePatch,
+    onImageRemove,
   }: {
     project: Project;
     /** Slide to show; falls back to ui.currentSlideId when omitted (§7.3). */
@@ -40,6 +47,10 @@
     isPresenting?: boolean;
     activeHighlightIndex?: number;
     onHighlightExitComplete?: () => void;
+    /** Enable image drag/resize affordances (editor only). */
+    allowImageEditing?: boolean;
+    onImagePatch?: (id: string, patch: Partial<SlideImage>) => void;
+    onImageRemove?: (id: string) => void;
   } = $props();
 
   const currentSlide = createCurrentSlide(
@@ -118,6 +129,16 @@
   );
 
   const previewFontSize = $derived(isPresenting ? fontSize * 1.15 : fontSize);
+
+  const slideImages = $derived(effectiveSlideImages(slide));
+  const imageEditActive = $derived(
+    allowImageEditing && imageEditorState.editMode && !isPresenting,
+  );
+  const imageEditProps = $derived({
+    editable: imageEditActive,
+    onPatch: onImagePatch,
+    onRemove: onImageRemove,
+  });
 </script>
 
 {#if !slide}
@@ -137,9 +158,20 @@
     {centerBlock}
     {bg}
     bind:ref={containerEl}
-  />
+  >
+    <SlideImageLayers
+      images={slideImages}
+      stageRef={() => containerEl}
+      {...imageEditProps}
+    />
+  </PreviewFallback>
 {:else}
   <PreviewStage bind:ref={containerEl} {bg} {stagePad} {centerBlock}>
+    <SlideImageLayers
+      images={slideImages}
+      stageRef={() => containerEl}
+      {...imageEditProps}
+    />
     <MagicMoveBlock
       bind:ref={codeContainerEl}
       {centerBlock}

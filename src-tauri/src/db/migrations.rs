@@ -2,7 +2,7 @@
 
 use sqlx::{Row, SqlitePool};
 
-pub const TARGET_VERSION: i64 = 8;
+pub const TARGET_VERSION: i64 = 9;
 
 pub async fn run_migrations(pool: &SqlitePool) -> Result<(), String> {
     let mut version = current_version(pool).await?;
@@ -237,6 +237,18 @@ pub async fn run_migrations(pool: &SqlitePool) -> Result<(), String> {
             .await
             .map_err(|e| format!("Failed to create slides section index: {e}"))?;
         version = 8;
+        set_version(pool, version).await?;
+    }
+
+    // v9: add images JSON column to slides for background/element image layers
+    if version < 9 {
+        if !column_exists(pool, "slides", "images").await? {
+            sqlx::query("ALTER TABLE slides ADD COLUMN images TEXT NOT NULL DEFAULT '[]'")
+                .execute(pool)
+                .await
+                .map_err(|e| format!("Failed to add slides.images: {e}"))?;
+        }
+        version = 9;
         set_version(pool, version).await?;
     }
 
