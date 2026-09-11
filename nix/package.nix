@@ -9,15 +9,15 @@ let
 
   srcMap = {
     x86_64-linux = fetchurl {
-      url = "https://github.com/codewiththiha/OpenSlides/releases/download/v${version}/OpenSlides_${version}_amd64.deb";
+      url = "https://github.com/alyohara/OpenSlides/releases/download/v${version}/OpenSlides_${version}_amd64.deb";
       hash = sources.hashes.x86_64-linux;
     };
     x86_64-darwin = fetchurl {
-      url = "https://github.com/codewiththiha/OpenSlides/releases/download/v${version}/OpenSlides_x64.app.tar.gz";
+      url = "https://github.com/alyohara/OpenSlides/releases/download/v${version}/OpenSlides_x64.app.tar.gz";
       hash = sources.hashes.x86_64-darwin;
     };
     aarch64-darwin = fetchurl {
-      url = "https://github.com/codewiththiha/OpenSlides/releases/download/v${version}/OpenSlides_aarch64.app.tar.gz";
+      url = "https://github.com/alyohara/OpenSlides/releases/download/v${version}/OpenSlides_aarch64.app.tar.gz";
       hash = sources.hashes.aarch64-darwin;
     };
   };
@@ -65,7 +65,7 @@ stdenv.mkDerivation {
 
   meta = with lib; {
     description = "Offline-first code presentation desktop app";
-    homepage = "https://github.com/codewiththiha/OpenSlides";
+    homepage = "https://github.com/alyohara/OpenSlides";
     license = licenses.mit;
     platforms = [ "x86_64-linux" "x86_64-darwin" "aarch64-darwin" ];
     mainProgram = "openslides";

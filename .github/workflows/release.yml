@@ -248,27 +248,3 @@ jobs:
               || echo "::warning::Could not restore original $BASENAME to the release" >&2
             exit 1
           fi
-
-  update-marketing-site:
-    needs: [extract-notes, build-tauri]
-    # Stable tags only — a prerelease tag (e.g. v1.2.3-rc.1) must not push
-    # release notes to the marketing site. String comparison (not fromJSON):
-    # fromJSON('') throws and GitHub silently treats a throwing `if` as false,
-    # which would skip the update with no signal. Every v-tag path above always
-    # sets isPrerelease, so this can only skip on a genuine prerelease.
-    if: startsWith(github.ref, 'refs/tags/v') && needs.extract-notes.outputs.isPrerelease == 'false'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send release notes to the marketing site
-        uses: actions/github-script@v7
-        env:
-          PAYLOAD: ${{ needs.extract-notes.outputs.payloadJson }}
-        with:
-          github-token: ${{ secrets.WEBSITE_DISPATCH_TOKEN }}
-          script: |
-            await github.rest.repos.createDispatchEvent({
-              owner: 'codewiththiha',
-              repo: 'OpenSlidesWebsite',
-              event_type: 'update_release_notes',
-              client_payload: JSON.parse(process.env.PAYLOAD),
-            })

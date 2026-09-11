@@ -73,7 +73,7 @@ jobs:
           )
 
           asset_names() {
-            gh release view "$TAG" --repo codewiththiha/OpenSlides \
+            gh release view "$TAG" --repo "${GITHUB_REPOSITORY}" \
               --json assets --jq '.assets[].name' 2>/dev/null || true
           }
 
@@ -111,7 +111,7 @@ jobs:
           trap 'rm -rf "$tmpdir"' EXIT
           for attempt in 1 2 3; do
             gh release download "$TAG" \
-              --repo codewiththiha/OpenSlides \
+              --repo "${GITHUB_REPOSITORY}" \
               --pattern "OpenSlides_${VERSION}_amd64.deb" \
               --pattern "OpenSlides_x64.app.tar.gz" \
               --pattern "OpenSlides_aarch64.app.tar.gz" \
@@ -119,7 +119,7 @@ jobs:
 
             ok=1
             for f in "${expected[@]}"; do
-              want=$(gh release view "$TAG" --repo codewiththiha/OpenSlides \
+              want=$(gh release view "$TAG" --repo "${GITHUB_REPOSITORY}" \
                 --json assets --jq ".assets[] | select(.name == \"$f\") | .size" 2>/dev/null)
               # wc right-pads its output (e.g. "     100"), so strip whitespace
               # before comparing; a missing file yields 0.
@@ -137,7 +137,7 @@ jobs:
           done
 
           for f in "${expected[@]}"; do
-            want=$(gh release view "$TAG" --repo codewiththiha/OpenSlides \
+            want=$(gh release view "$TAG" --repo "${GITHUB_REPOSITORY}" \
               --json assets --jq ".assets[] | select(.name == \"$f\") | .size" 2>/dev/null)
             have=$(wc -c < "$tmpdir/$f" 2>/dev/null | tr -d '[:space:]')
             have=${have:-0}
