@@ -3,7 +3,7 @@
 use sqlx::sqlite::{
     SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteSynchronous,
 };
-use sqlx::{ConnectOptions, SqlitePool};
+use sqlx::SqlitePool;
 use std::path::Path;
 use std::time::Duration;
 use tauri::{AppHandle, Manager};
@@ -32,9 +32,13 @@ async fn migrate_legacy_db(app_data_dir: &Path, db_path: &Path) {
             continue;
         }
 
-        if let Ok(mut conn) = SqliteConnectOptions::new().filename(&legacy).connect_with().await {
+        if let Ok(pool) = SqlitePoolOptions::new()
+            .max_connections(1)
+            .connect_with(SqliteConnectOptions::new().filename(&legacy))
+            .await
+        {
             let _ = sqlx::raw_sql("PRAGMA wal_checkpoint(TRUNCATE)")
-                .execute(&mut conn)
+                .execute(&pool)
                 .await;
         }
 
