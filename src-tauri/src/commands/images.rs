@@ -56,9 +56,9 @@ pub async fn pick_image_file(app: AppHandle) -> CommandResult<String> {
             .map_err(|e| CommandError::Failed(format!("Failed to read image: {e}")))
     })
     .await
-    .map_err(|e| CommandError::Failed(format!("Image read task failed: {e}")))?
-    .map_err(|e| e)?;
+    .map_err(|e| CommandError::Failed(format!("Image read task failed: {e}")))?;
 
+    let bytes: Vec<u8> = bytes?;
     let encoded = BASE64.encode(bytes);
     Ok(format!("data:{mime};base64,{encoded}"))
 }
