@@ -12,7 +12,6 @@
   import EditorSlideNav from "./EditorSlideNav.svelte";
   import { cn } from "$lib/lib/utils";
   import { supportedLanguageOptions } from "$lib/lib/backend-config.svelte";
-  import { effectiveSlideImages } from "$lib/stores/slide-images.svelte";
   import {
     imageEditorState,
     openImageEditor,
@@ -50,7 +49,7 @@
 
   const languageOptions = $derived(supportedLanguageOptions());
   const imageCount = $derived(
-    effectiveSlideImages(project.slides[currentIndex]).length,
+    (project.slides[currentIndex]?.images ?? []).length,
   );
 </script>
 
