@@ -11,6 +11,7 @@
     Pause,
     Settings2,
     Download,
+    FileText,
     Focus,
     Moon,
     Sun,
@@ -30,6 +31,7 @@
   } from "$lib/stores/ui-state.svelte";
   import {
     exportProjectMutation,
+    exportPdfMutation as createExportPdfMutation,
     updateSlideSettingsMutation,
   } from "$lib/queries";
   import { modKeyLabel } from "$lib/lib/platform";
@@ -50,6 +52,7 @@
   } = $props();
 
   const exportMutation = exportProjectMutation();
+  const exportPdf = createExportPdfMutation();
   // Stable per mount (rendered only after the project loads, under the
   // project-keyed EditorInner) — untrack() marks the capture as deliberate.
   const updateSlideSettings = updateSlideSettingsMutation(
@@ -198,6 +201,17 @@
       onclick={() => exportMutation.mutate(project.id)}
     >
       <Download class="h-4 w-4" />
+    </Button>
+
+    <Button
+      variant="ghost"
+      size="icon"
+      class="h-8 w-8"
+      title="Export as PDF"
+      disabled={exportPdf.isPending}
+      onclick={() => exportPdf.mutate(project.id)}
+    >
+      <FileText class="h-4 w-4" />
     </Button>
 
     <Button

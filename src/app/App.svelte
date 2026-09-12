@@ -8,8 +8,10 @@
    */
   import Router from "svelte-spa-router";
   import AppToaster from "$lib/ui/AppToaster.svelte";
+  import UpdateDialog from "$lib/components/UpdateDialog.svelte";
   import { routes } from "./routes";
 </script>
 
 <Router {routes} />
 <AppToaster />
+<UpdateDialog />

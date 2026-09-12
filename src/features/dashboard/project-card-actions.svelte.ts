@@ -13,6 +13,7 @@ type ProjectCardActions = {
   readonly renameValue: string;
   readonly duplicateBusy: boolean;
   readonly commitBusy: boolean;
+  readonly exportPdfBusy: boolean;
   setRenameValue: (value: string) => void;
   commitRename: () => void;
   cancelRename: () => void;
@@ -20,6 +21,7 @@ type ProjectCardActions = {
   open: (id: string) => void;
   duplicate: (id: string) => void;
   exportProject: (id: string) => void;
+  exportPdf: (id: string) => void;
   remove: (id: string, name: string) => void;
 };
 

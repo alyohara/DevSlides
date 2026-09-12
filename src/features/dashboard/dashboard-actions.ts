@@ -9,15 +9,19 @@ import {
   duplicateProjectMutation,
   deleteProjectMutation,
   exportProjectMutation,
+  exportPdfMutation,
   importProjectMutation,
   renameProjectMutation,
 } from "$lib/queries";
 import { api } from "$lib/lib/tauri-api";
 import { notify } from "$lib/lib/toast";
+import { APP_ISSUES_URL, APP_REPOSITORY_URL } from "$lib/lib/app-info";
 import { DEFAULT_THEME } from "$lib/constants";
+import { checkForUpdatesFromMenu } from "$lib/updates/update-check";
 import {
   setIsCommandOpen,
   setIsShortcutsOpen,
+  setIsAboutOpen,
   toggleTheme,
 } from "$lib/stores/ui-state.svelte";
 import {
@@ -33,12 +37,14 @@ export function createDashboardActions(
   const duplicateMutation = duplicateProjectMutation();
   const deleteMutation = deleteProjectMutation();
   const exportMutation = exportProjectMutation();
+  const pdfMutation = exportPdfMutation();
   const importMutation = importProjectMutation();
   const renameMutation = renameProjectMutation();
 
   const open = (id: string) => void push(`/editor/${id}`);
   const duplicate = (id: string) => duplicateMutation.mutate(id);
   const exportProject = (id: string) => exportMutation.mutate(id);
+  const exportPdf = (id: string) => pdfMutation.mutate(id);
   const requestDelete = (id: string, name: string) =>
     (st.deleteTarget = { id, name });
 
@@ -89,11 +95,13 @@ export function createDashboardActions(
     createMutation,
     duplicateMutation,
     exportMutation,
+    pdfMutation,
     importMutation,
     renameMutation,
     open,
     duplicate,
     exportProject,
+    exportPdf,
     requestDelete,
     confirmDelete,
     create,
@@ -113,9 +121,19 @@ export function installDashboardMenu(
     "menu://toggle-theme": () => toggleTheme(),
     "menu://shortcuts-app": () => setIsShortcutsOpen(true),
     "menu://shortcuts-help": () => setIsShortcutsOpen(true),
+    "menu://help-docs": () =>
+      void api.openUrl(APP_REPOSITORY_URL).catch(() => {}),
+    "menu://report-issue": () =>
+      void api.openUrl(APP_ISSUES_URL).catch(() => {}),
+    "menu://about": () => setIsAboutOpen(true),
+    "menu://check-updates": () => void checkForUpdatesFromMenu(),
     "menu://export": () => {
       const first = st.projects[0];
       if (first) actions.exportMutation.mutate(first.id);
+    },
+    "menu://export-pdf": () => {
+      const first = st.projects[0];
+      if (first) actions.pdfMutation.mutate(first.id);
     },
   };
   subscribeToAppMenu(() => handlers);

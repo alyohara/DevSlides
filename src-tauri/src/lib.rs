@@ -51,10 +51,14 @@ pub fn run() {
             stack_slides,
             unstack_slides,
             export_project_to_json,
+            export_project_to_pdf,
             import_project_from_json,
             pick_image_file,
             read_clipboard_image,
             search_slides,
+            get_app_info,
+            open_url,
+            check_for_updates,
             finish_quit,
         ])
         .on_window_event(|window, event| {

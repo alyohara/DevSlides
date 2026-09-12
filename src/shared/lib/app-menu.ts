@@ -16,6 +16,7 @@ export type AppMenuEvent =
   | "menu://new-project"
   | "menu://open-dashboard"
   | "menu://export"
+  | "menu://export-pdf"
   | "menu://present"
   | "menu://zen"
   | "menu://settings"
@@ -25,6 +26,10 @@ export type AppMenuEvent =
   | "menu://toggle-theme"
   | "menu://shortcuts-app"
   | "menu://shortcuts-help"
+  | "menu://help-docs"
+  | "menu://report-issue"
+  | "menu://about"
+  | "menu://check-updates"
   | "menu://undo"
   | "menu://redo";
 
@@ -59,9 +64,10 @@ export async function installAppMenu(): Promise<void> {
       await PredefinedMenuItem.new({ item: "Separator" }),
       await item(
         "menu://export",
-        "Export…",
+        "Export JSON…",
         shortcutAccelerator(SHORTCUTS.export),
       ),
+      await item("menu://export-pdf", "Export PDF…"),
       await PredefinedMenuItem.new({ item: "Separator" }),
       await PredefinedMenuItem.new({ item: "CloseWindow", text: "Close" }),
     ];
@@ -125,9 +131,15 @@ export async function installAppMenu(): Promise<void> {
       ),
     ];
 
-    // Help: only Keyboard Shortcuts (no About — same modal was confusing)
+    // Help: keyboard reference + docs links + About.
     const helpItems = [
       await item("menu://shortcuts-help", "Keyboard Shortcuts"),
+      await PredefinedMenuItem.new({ item: "Separator" }),
+      await item("menu://help-docs", "Documentation"),
+      await item("menu://report-issue", "Report an Issue"),
+      await PredefinedMenuItem.new({ item: "Separator" }),
+      await item("menu://check-updates", "Check for Updates…"),
+      await item("menu://about", "About DevSlides"),
     ];
 
     const submenus = [
@@ -142,6 +154,8 @@ export async function installAppMenu(): Promise<void> {
       const appMenu = await Submenu.new({
         text: "DevSlides",
         items: [
+          await item("menu://about", "About DevSlides"),
+          await PredefinedMenuItem.new({ item: "Separator" }),
           await item("menu://shortcuts-app", "Keyboard Shortcuts"),
           await PredefinedMenuItem.new({ item: "Separator" }),
           await PredefinedMenuItem.new({ item: "Services" }),

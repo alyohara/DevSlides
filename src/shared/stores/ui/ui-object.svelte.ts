@@ -24,6 +24,7 @@ import type {
   PreviewSlideSettings,
   SaveStatus,
 } from "../types";
+import type { UpdateInfo } from "$lib/lib/tauri-api";
 
 const persisted = loadPersistedUiState();
 
@@ -40,6 +41,9 @@ export const ui = $state({
   isCommandOpen: false,
   isGoToSlideOpen: false,
   isShortcutsOpen: false,
+  isAboutOpen: false,
+  isUpdateOpen: false,
+  updateInfo: null as UpdateInfo | null,
   isDarkUi: persisted.isDarkUi ?? true,
   editorShowLineNumbers: persisted.editorShowLineNumbers ?? true,
   showSlideHoverPreview: persisted.showSlideHoverPreview ?? false,

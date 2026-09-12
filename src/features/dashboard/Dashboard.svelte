@@ -5,6 +5,7 @@
   import TitleBar from "$lib/components/TitleBar.svelte";
   import CommandPalette from "$lib/components/CommandPalette.svelte";
   import ShortcutsHelp from "$lib/components/ShortcutsHelp.svelte";
+  import AboutDialog from "$lib/components/AboutDialog.svelte";
   import CreateDeckTile from "@/features/dashboard/CreateDeckTile.svelte";
   import DashboardStates from "@/features/dashboard/DashboardStates.svelte";
   import ProjectGrid from "@/features/dashboard/ProjectGrid.svelte";
@@ -73,6 +74,9 @@
     get commitBusy() {
       return actions.renameMutation.isPending;
     },
+    get exportPdfBusy() {
+      return actions.pdfMutation.isPending;
+    },
     setRenameValue: (v: string) => (rename.value = v),
     commitRename: rename.commit,
     cancelRename: rename.cancel,
@@ -80,6 +84,7 @@
     open: actions.open,
     duplicate: actions.duplicate,
     exportProject: actions.exportProject,
+    exportPdf: actions.exportPdf,
     remove: actions.requestDelete,
   });
 
@@ -157,6 +162,7 @@
 
   <CommandPalette />
   <ShortcutsHelp />
+  <AboutDialog />
   <ConfirmDialog
     open={st.deleteTarget !== null}
     title="Delete &quot;{st.deleteTarget?.name}&quot;?"

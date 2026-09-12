@@ -25,6 +25,24 @@ export type SlideSettingsPatch = Partial<{
 
 export type SettingsPatch = Partial<ProjectSettings>;
 
+/** App metadata returned by the Rust backend (`get_app_info`). */
+export interface AppInfo {
+  name: string;
+  version: string;
+  description: string;
+  repository: string;
+}
+
+/** Result of an update check against the latest GitHub release. */
+export interface UpdateInfo {
+  currentVersion: string;
+  latestVersion: string | null;
+  releaseUrl: string | null;
+  releaseNotes: string | null;
+  updateAvailable: boolean;
+  checkError: string | null;
+}
+
 /**
  * Error thrown for failed Tauri commands. Rust can attach a machine-readable
  * `code` (see IoCommandError in src-tauri/src/commands/io.rs, which
@@ -143,6 +161,10 @@ export const api = {
   exportProjectToJson: (projectId: string) =>
     call<string>("export_project_to_json", { projectId }),
 
+  /** Persist a finished PDF (base64) through a native save dialog. */
+  exportPdf: (bytesB64: string, projectName: string) =>
+    call<string>("export_project_to_pdf", { bytesB64, projectName }),
+
   importProjectFromJson: () => call<Project>("import_project_from_json"),
 
   /** Pick an image from a native dialog; returns an embedded data URL. */
@@ -165,6 +187,15 @@ export const api = {
 
   unstackSlides: (projectId: string, slideIds: string[]) =>
     call<Slide[]>("unstack_slides", { projectId, slideIds }),
+
+  getAppInfo: () => call<AppInfo>("get_app_info"),
+
+  /** Open an external URL in the user's default browser. */
+  openUrl: (url: string) => call<void>("open_url", { url }),
+
+  /** Check whether a newer release exists (fetch runs in Rust — the webview
+   *  CSP forbids outbound HTTP). */
+  checkForUpdates: () => call<UpdateInfo>("check_for_updates"),
 };
 
 /* Highlight DTOs (SelectionRange, HighlightPlan, HighlightTokenLine …) now

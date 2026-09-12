@@ -1,6 +1,7 @@
 import { createMutation, createQuery } from "@tanstack/svelte-query";
 import { notify } from "$lib/lib/toast";
 import { api, isCancelledError, type SettingsPatch } from "$lib/lib/tauri-api";
+import { exportProjectToPdfById } from "$lib/export/pdf-export";
 import { projectKeys } from "./keys";
 import { queryClient } from "./query-client";
 import { projectListMutation } from "./mutation-policy";
@@ -232,6 +233,22 @@ export function exportProjectMutation() {
         // User closed the save dialog — not a failure.
         if (!isCancelledError(err)) {
           notify.error(`Export failed: ${err.message}`);
+        }
+      },
+    }),
+    () => queryClient,
+  );
+}
+
+export function exportPdfMutation() {
+  return createMutation(
+    () => ({
+      mutationFn: (projectId: string) => exportProjectToPdfById(projectId),
+      onSuccess: (path) => notify.success(`PDF exported to ${path}`),
+      onError: (err: Error) => {
+        // User closed the save dialog — not a failure.
+        if (!isCancelledError(err)) {
+          notify.error(`PDF export failed: ${err.message}`);
         }
       },
     }),

@@ -10,6 +10,8 @@
     hoverPreview: 200,
     command: 200,
     shortcuts: 210,
+    about: 215,
+    update: 220,
   } as const;
 </script>
 

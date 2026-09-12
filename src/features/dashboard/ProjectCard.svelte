@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { ArrowRight, Copy, Download, Pencil, Trash2 } from "@lucide/svelte";
+  import {
+    ArrowRight,
+    Copy,
+    Download,
+    FileText,
+    Pencil,
+    Trash2,
+  } from "@lucide/svelte";
   import Card from "$lib/ui/Card.svelte";
   import { formatRelative } from "$lib/lib/utils";
   import { type ProjectSummary } from "$lib/types";
@@ -119,6 +126,17 @@
           }}
         >
           <Download class="h-3.5 w-3.5" />
+        </HoverActionButton>
+        <HoverActionButton
+          size="md"
+          title="Export as PDF"
+          onclick={(e) => {
+            e.stopPropagation();
+            cardActions.exportPdf(project.id);
+          }}
+          disabled={cardActions.exportPdfBusy}
+        >
+          <FileText class="h-3.5 w-3.5" />
         </HoverActionButton>
         <HoverActionButton
           size="md"

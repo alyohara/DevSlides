@@ -89,7 +89,7 @@
 
   {#if imageEditorState.open}
     <div
-      class="absolute top-3 left-3 z-[60] w-64 rounded-lg border bg-card/95 shadow-lg backdrop-blur"
+      class="absolute top-3 right-3 z-[60] w-64 rounded-lg border bg-card/95 shadow-lg backdrop-blur"
     >
       <SlideImagesPanel
         slideId={activeSlide?.id}

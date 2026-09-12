@@ -31,6 +31,9 @@ export {
   setIsSettingsOpen,
   setIsCommandOpen,
   setIsShortcutsOpen,
+  setIsAboutOpen,
+  setIsUpdateOpen,
+  setUpdateInfo,
   toggleShortcutsOpen,
 } from "./ui/dialogs";
 export {

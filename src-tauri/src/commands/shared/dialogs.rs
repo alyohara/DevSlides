@@ -4,8 +4,10 @@ use std::sync::mpsc;
 use tauri::AppHandle;
 use tauri_plugin_dialog::DialogExt;
 
+#[derive(Debug, Clone, Copy)]
 pub enum DialogMode {
     Save,
+    SavePdf,
     Open,
 }
 
@@ -32,12 +34,21 @@ pub fn dialog_pick_path(
     default_name: Option<&str>,
 ) -> Option<std::path::PathBuf> {
     let (tx, rx) = mpsc::channel();
-    let mut builder = app.dialog().file().add_filter("JSON", &["json"]);
+    let mut builder = app.dialog().file();
+    builder = match mode {
+        DialogMode::Save => builder.add_filter("JSON", &["json"]),
+        DialogMode::SavePdf => {
+            builder
+                .add_filter("PDF", &["pdf"])
+                .set_default_extension("pdf")
+        }
+        DialogMode::Open => builder.add_filter("JSON", &["json"]),
+    };
     if let Some(name) = default_name {
         builder = builder.set_file_name(name);
     }
     match mode {
-        DialogMode::Save => {
+        DialogMode::Save | DialogMode::SavePdf => {
             builder.save_file(move |path| {
                 let _ = tx.send(path);
             });

@@ -31,6 +31,7 @@
   import AsyncState from "$lib/components/AsyncState.svelte";
   import CommandPalette from "$lib/components/CommandPalette.svelte";
   import ShortcutsHelp from "$lib/components/ShortcutsHelp.svelte";
+  import AboutDialog from "$lib/components/AboutDialog.svelte";
   import EditorToolbar from "./EditorToolbar.svelte";
   import EditorLayout from "./EditorLayout.svelte";
   import GoToSlideDialog from "./GoToSlideDialog.svelte";
@@ -38,6 +39,7 @@
   import {
     createProjectMutation,
     exportProjectMutation,
+    exportPdfMutation,
     updateProjectThemeMutation,
   } from "$lib/queries";
   import { createAddSlide } from "@/features/slides/add-slide.svelte";
@@ -64,6 +66,7 @@
   const slides = $derived(st.slides);
 
   const exportMutation = exportProjectMutation();
+  const exportPdf = exportPdfMutation();
   const duplicateSlide = createSlideDuplicator(pid);
   const updateTheme = updateProjectThemeMutation(pid);
   const createProject = createProjectMutation();
@@ -119,6 +122,7 @@
     projectId: () => projectId,
     createProject: (name) => createProject.mutateAsync(name),
     exportProject: (id) => exportMutation.mutate(id),
+    exportPdf: (id) => exportPdf.mutate(id),
     enterPresent,
     addSlide,
     duplicateSlide,
@@ -207,5 +211,6 @@
     <GoToSlideDialog {project} />
 
     <ShortcutsHelp />
+    <AboutDialog />
   </div>
 {/if}

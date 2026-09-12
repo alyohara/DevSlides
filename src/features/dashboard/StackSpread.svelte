@@ -47,6 +47,9 @@
     get commitBusy() {
       return baseCardActions.commitBusy;
     },
+    get exportPdfBusy() {
+      return baseCardActions.exportPdfBusy;
+    },
     setRenameValue: baseCardActions.setRenameValue,
     commitRename: baseCardActions.commitRename,
     cancelRename: baseCardActions.cancelRename,
@@ -58,6 +61,7 @@
     },
     duplicate: baseCardActions.duplicate,
     exportProject: baseCardActions.exportProject,
+    exportPdf: baseCardActions.exportPdf,
     remove: baseCardActions.remove,
   });
 
