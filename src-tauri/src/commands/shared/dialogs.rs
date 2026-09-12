@@ -37,11 +37,7 @@ pub fn dialog_pick_path(
     let mut builder = app.dialog().file();
     builder = match mode {
         DialogMode::Save => builder.add_filter("JSON", &["json"]),
-        DialogMode::SavePdf => {
-            builder
-                .add_filter("PDF", &["pdf"])
-                .set_default_extension("pdf")
-        }
+        DialogMode::SavePdf => builder.add_filter("PDF", &["pdf"]),
         DialogMode::Open => builder.add_filter("JSON", &["json"]),
     };
     if let Some(name) = default_name {
