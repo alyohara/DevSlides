@@ -1,6 +1,6 @@
 [package]
 name = "devslides"
-version = "1.4.0"
+version = "1.4.1"
 description = "DevSlides — offline-first code presentation desktop app (a fork of OpenSlides)"
 authors = ["codewiththiha", "alyohara"]
 edition = "2024"
