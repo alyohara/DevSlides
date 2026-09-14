@@ -23,8 +23,16 @@
     type PaneHandle,
   } from "@/features/editor/panels.svelte";
   import { cn } from "$lib/lib/utils";
-  import type { Project, Slide } from "$lib/types";
+  import type { Project, Slide, SlideImage } from "$lib/types";
   import { Z_INDEX } from "$lib/ui/Overlay.svelte";
+  import { untrack } from "svelte";
+  import SlideImagesPanel from "@/features/images/SlideImagesPanel.svelte";
+  import { createImageSave } from "@/features/images/save-images.svelte";
+  import { imageEditorState } from "@/features/images/image-editor-state.svelte";
+  import {
+    effectiveSlideImages,
+    setLocalImages,
+  } from "$lib/stores/slide-images.svelte";
   import {
     PANEL_CODE_MIN,
     PANEL_CODE_MAX,
@@ -70,6 +78,34 @@
   const isZenMode = $derived(ui.isZenMode);
   const isBottomPanelCollapsed = $derived(ui.isBottomPanelCollapsed);
   const isCodePanelCollapsed = $derived(ui.isCodePanelCollapsed);
+
+  // ── Image editor state ─────────────────────────────
+  const slideImages = $derived(effectiveSlideImages(activeSlide));
+
+  const imageSave = createImageSave({
+    projectId: untrack(() => project.id),
+    slideId: () => activeSlide?.id,
+  });
+
+  function replaceImages(next: SlideImage[]) {
+    if (!activeSlide) return;
+    setLocalImages(activeSlide.id, next);
+    imageSave.schedule(activeSlide.id, next);
+  }
+
+  function patchImage(id: string, patch: Partial<SlideImage>) {
+    replaceImages(
+      slideImages.map((i) => (i.id === id ? { ...i, ...patch } : i)),
+    );
+  }
+
+  function addImage(img: SlideImage) {
+    replaceImages([...slideImages, img]);
+  }
+
+  function removeImage(id: string) {
+    replaceImages(slideImages.filter((i) => i.id !== id));
+  }
 
   // Older saved layouts may be smaller; never restore an expanded slides rail
   // below the space required for a complete centered card.
@@ -119,6 +155,19 @@
         />
       </RenderBoundary>
     {/key}
+    {#if imageEditorState.open}
+      <div
+        class="absolute top-3 right-3 z-[60] w-64 rounded-lg border bg-card/95 shadow-lg backdrop-blur"
+      >
+        <SlideImagesPanel
+          slideId={activeSlide?.id}
+          images={slideImages}
+          onPatch={patchImage}
+          onAdd={addImage}
+          onRemove={removeImage}
+        />
+      </div>
+    {/if}
   </div>
 {/if}
 
@@ -153,6 +202,8 @@
               {effectiveHighlight}
               {onHighlightExitComplete}
               {onSelectHighlight}
+              onImagePatch={patchImage}
+              onImageRemove={removeImage}
             />
           </div>
         </Pane>
@@ -188,15 +239,30 @@
                 title="Expand code editor (or drag the handle)"
               />
             {:else}
-              {#key `editor-${project.id}`}
-                <RenderBoundary>
-                  <CodeEditor
-                    {project}
-                    onToggleExpand={() => onToggleEditorExpanded(true)}
-                    onCollapse={collapseCodePanel}
-                  />
-                </RenderBoundary>
-              {/key}
+              <div class="relative h-full">
+                {#key `editor-${project.id}`}
+                  <RenderBoundary>
+                    <CodeEditor
+                      {project}
+                      onToggleExpand={() => onToggleEditorExpanded(true)}
+                      onCollapse={collapseCodePanel}
+                    />
+                  </RenderBoundary>
+                {/key}
+                {#if imageEditorState.open}
+                  <div
+                    class="absolute top-3 right-3 z-[60] w-64 rounded-lg border bg-card/95 shadow-lg backdrop-blur"
+                  >
+                    <SlideImagesPanel
+                      slideId={activeSlide?.id}
+                      images={slideImages}
+                      onPatch={patchImage}
+                      onAdd={addImage}
+                      onRemove={removeImage}
+                    />
+                  </div>
+                {/if}
+              </div>
             {/if}
           </Pane>
         {/if}
